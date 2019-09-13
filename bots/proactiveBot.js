@@ -112,7 +112,7 @@ class ProactiveBot extends ActivityHandler {
         console.log(context.activity.text);
         console.log(parsedTime);
         
-        if (parsedTime.length !== 3) {
+        if (parsedTime === null || parsedTime.length !== 3) {
             console.log('Cannot parse time in menu ' + context.activity.text);
             await context.sendActivity('Ơ chị Pháo ơi, em không đọc được giờ chốt ạ >~<');
             await context.sendActivity('Chị nhớ ghi là "lúc 10h30" hay "11h00" e mới hiểu nha');
@@ -127,14 +127,14 @@ class ProactiveBot extends ActivityHandler {
         let remindHour = hour,
             remindMinute = minute - this.reminderBefore;
 
-        if (closeMinute < 0) {
+        if (remindMinute < 0) {
             remindHour = (closeHour - 1) % 24;
             remindMinute = (minute - this.reminderBefore) % 60;
         }
         
         this.orderEnabled = true;
         
-        const reminder = new CronJob(`0 ${minute} ${hour} * * ${year}`, async function() {
+        const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * ${year}`, async function() {
             await context.sendActivity(`
                 Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
                 Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.
