@@ -64,7 +64,7 @@ server.post('/api/messages', (req, res) => {
 
 // Listen for incoming notifications and send proactive messages to users.
 const chatHTML = `<html><body>
-<form action="/chat">
+<form action="/chat" type="POST">
     <input type="text" name="chat" value="" placeholder="Type a message here">
     <input type="submit" value="Submit">
 </form>
@@ -79,7 +79,7 @@ server.get('/chat', async (req, res) => {
 
 server.post('/chat', async (req, res) => {
     console.log(req.params);
-    
+
     if (bot.groupConversationReference && req.params.chat) {
         await adapter.continueConversation(bot.groupConversationReference, async turnContext => {
             await turnContext.sendActivity(req.params.chat);
