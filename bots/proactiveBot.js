@@ -179,7 +179,7 @@ class ProactiveBot extends ActivityHandler {
         }
         
         let rawHour = parsedTime[1], // to keep leading zero in message
-            rawMinute = parsedTime[1], // to keep leading zero in message
+            rawMinute = parsedTime[2], // to keep leading zero in message
             hour = parseInt(parsedTime[1]),
             minute = parseInt(parsedTime[2]);
 
