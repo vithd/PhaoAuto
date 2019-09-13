@@ -109,6 +109,8 @@ class ProactiveBot extends ActivityHandler {
 
     async openOrder(context, next) {
         const parsedTime = this.timePattern.exec(context.activity.text);
+        console.log(context.activity.text);
+        console.log(parsedTime);
         
         if (parsedTime.length !== 3) {
             console.log('Cannot parse time in menu ' + context.activity.text);
@@ -119,7 +121,8 @@ class ProactiveBot extends ActivityHandler {
         }
         
         let hour = parseInt(parsedTime[1]),
-        minute = parseInt(parsedTime[2]);
+        minute = parseInt(parsedTime[2]),
+        year = new Date().getFullYear();
 
         let remindHour = hour,
             remindMinute = minute - this.reminderBefore;
@@ -131,7 +134,7 @@ class ProactiveBot extends ActivityHandler {
         
         this.orderEnabled = true;
         
-        const reminder = new CronJob(`0 ${minute} ${hour} * * *`, async function() {
+        const reminder = new CronJob(`0 ${minute} ${hour} * * ${year}`, async function() {
             await context.sendActivity(`
                 Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
                 Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.
@@ -142,7 +145,7 @@ class ProactiveBot extends ActivityHandler {
             reminder.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        const order = new CronJob(`0 ${minute} ${hour} * * *`, async function() {
+        const order = new CronJob(`0 ${minute} ${hour} * * ${year}`, async function() {
             let orderRecords = ['meo', 'chuot'];
             await context.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
             await context.sendActivity(orderRecords.join('\n'));
