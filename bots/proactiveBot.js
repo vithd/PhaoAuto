@@ -100,7 +100,7 @@ class ProactiveBot extends ActivityHandler {
         }
 
         if (this.orderEnabled || true) {
-            const parseOrder = /Pháo Tự Động (\d+ [a-zA-Z ]+)/.exec(context.activity.text);
+            const parseOrder = /Pháo Tự Động\s*(\d+.*)/.exec(context.activity.text);
             if (parseOrder !== null && parseOrder[1]) {
                 await this.placeOrder(context, next, parseOrder[1]);
                 return;
