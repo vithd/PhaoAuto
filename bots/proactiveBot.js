@@ -104,7 +104,7 @@ class ProactiveBot extends ActivityHandler {
             const parseOrder = /Pháo Tự Động\s*(\d+)(.*)/.exec(context.activity.text);
             if (parseOrder !== null && parseOrder.length > 1) {
                 const quantity = parseInt(parseOrder[1]);
-                const note = parseOrder.length === 3 ? parseOrder[2].trim() : '';
+                let note = parseOrder.length === 3 ? parseOrder[2].trim() : '';
 
                 if (Number.isNaN(quantity)) {
                     await context.sendActivity('Sorry >~< Em không đọc được số lượng ạ, đặt lại giùm em nha');
