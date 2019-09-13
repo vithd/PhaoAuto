@@ -65,7 +65,7 @@ server.post('/api/messages', (req, res) => {
 // Listen for incoming notifications and send proactive messages to users.
 const chatHTML = `<html><body>
 <form action="/chat" type="POST">
-    <input type="text" name="chat" value="" placeholder="Type a message here">
+    <input type="text" name="chat" value="" placeholder="Type a message here" autocomplete="off">
     <input type="submit" value="Submit">
 </form>
 </body></html>`;
