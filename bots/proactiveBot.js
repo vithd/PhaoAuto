@@ -88,6 +88,7 @@ class ProactiveBot extends ActivityHandler {
     //
     async directMessageHandler(context) {
         const text = context.activity.text.toLowerCase().trim();
+        console.log(text);
 
         // Admin Register
         if (text === this.masterPassword) {
@@ -177,6 +178,7 @@ Send private message to Pháo Tự Động for instruction~`);
     }
 
     async sendHelpMessage(context) {
+        console.log('sendHelpMessage');
         const name = context.activity.from.name;
 
         await context.sendActivity(`Xin chào ${name}! Đây là Cơm Pháo~ Hàng ngày vào buổi sáng chị chủ Pháo sẽ gửi cơm vào group và hẹn giờ chốt cơm. Em sẽ mở đăng ký đến giờ chốt cơm, nhận tiền và báo nợ thay mặt chị chủ.
@@ -202,7 +204,6 @@ How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động w
 Ex: @Pháo Tự Động x`);
 
         await next();
-        console.log('ABC');
     }
 }
 
