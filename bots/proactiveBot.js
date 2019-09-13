@@ -53,10 +53,10 @@ class ProactiveBot extends ActivityHandler {
             this.addConversationReference(context.activity);
             
             if (context.activity.conversation.isGroup === false) {
-                return this.directMessageHandler(context.activity);
+                return this.directMessageHandler(context);
             }
             
-            return this.groupMessageHandler(context.activity);
+            return this.groupMessageHandler(context);
         });
     }
     
