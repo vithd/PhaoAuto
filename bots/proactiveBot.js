@@ -52,6 +52,7 @@ class ProactiveBot extends ActivityHandler {
 
         this.onMessage(async (context, next) => {
             this.addConversationReference(context.activity);
+            console.log(context.activity);
             
             if (context.activity.conversation.isGroup) {
                 return this.groupMessageHandler(context, next);
@@ -89,7 +90,6 @@ class ProactiveBot extends ActivityHandler {
     //
     async directMessageHandler(context, next) {
         const text = context.activity.text.toLowerCase().trim();
-        console.log(text);
 
         // Admin Register
         if (text === this.masterPassword) {
@@ -100,7 +100,7 @@ class ProactiveBot extends ActivityHandler {
         }
 
         // Help message
-        await this.sendHelpMessage(context);
+        await this.sendHelpMessage(context, next);
     }
 
     async openOrder(context, next) {
