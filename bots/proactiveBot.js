@@ -99,7 +99,6 @@ class ProactiveBot extends ActivityHandler {
 
         // Help message
         this.sendHelpMessage(context);
-        return;
     }
 
     async openOrder(context) {
@@ -203,6 +202,7 @@ How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động w
 Ex: @Pháo Tự Động x`);
 
         await next();
+        console.log('ABC');
     }
 }
 
