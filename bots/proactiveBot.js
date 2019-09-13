@@ -192,8 +192,8 @@ class ProactiveBot extends ActivityHandler {
             remindMinute = minute - this.reminderBefore;
 
         if (remindMinute < 0) {
-            remindHour = (remindHour - 1) % 24;
-            remindMinute = (minute - this.reminderBefore) % 60;
+            remindHour = this.mod((remindHour - 1), 24);
+            remindMinute = this.mod((minute - this.reminderBefore), 60);
         }
         
         this.orderEnabled = true;
@@ -243,7 +243,7 @@ class ProactiveBot extends ActivityHandler {
         // THE BILL COMES DUE
         if (this.debug) {
             var billHour = hour,
-                billMinute = (minute + 1) % 60;
+                billMinute = this.mod((minute + 1), 60);
     
             if (billMinute < minute) {
                 billHour += 1;
@@ -436,6 +436,12 @@ Ex: @Pháo Tự Động x`);
         }
 
         await next();
+    }
+
+    // The % operator in JavaScript is the remainder operator, not the modulo operator
+    // (the main difference being in how negative numbers are treated):
+    mod(n, m) {
+        return ((n % m) + m) % m;
     }
 }
 
