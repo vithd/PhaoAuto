@@ -73,10 +73,6 @@ class ProactiveBot extends ActivityHandler {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
 
-                await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
-                    await turnContext.sendActivity('proactive hello');
-                });
-
                 await context.sendActivity('Dạ, em nhớ rồi ạ');
                 await next();
                 return;
@@ -114,13 +110,11 @@ class ProactiveBot extends ActivityHandler {
 
     async openOrder(context, next) {
         let parsedTime = /lúc (\d+)h(\d+)/gi.exec(context.activity.text);
-        console.log(context.activity.text);
-        console.log(parsedTime);
         
         if (parsedTime === null || parsedTime.length !== 3) {
             console.log('Cannot parse time in menu ' + context.activity.text);
             await context.sendActivity('Ơ chị Pháo ơi, em không đọc được giờ chốt ạ >~<');
-            await context.sendActivity('Chị nhớ ghi là "lúc 10h30" hay "11h00" e mới hiểu nha');
+            await context.sendActivity('Chị nhớ ghi là "lúc 10h30" hay "13h00" e mới hiểu nha');
             await next();
             return;
         }
@@ -138,24 +132,30 @@ class ProactiveBot extends ActivityHandler {
         }
         
         this.orderEnabled = true;
+        console.log(`Order at ${hour}:${minute}, remind at ${remindHour}:${remindMinute}`);
         
         const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * ${year}`, async function() {
-            await context.sendActivity(`
-                Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
-                Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.
-            `);
-            await next();
 
-            console.log('Reminder sent');
+            await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
+                await turnContext.sendActivity(`
+                    Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
+                    Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.
+                `);
+                console.log('Reminder sent');
+            });
+
             reminder.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
         const order = new CronJob(`0 ${minute} ${hour} * * ${year}`, async function() {
             let orderRecords = ['meo', 'chuot'];
-            await context.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
-            await context.sendActivity(orderRecords.join('\n'));
-            await next();
 
+            await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
+                await turnContext.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
+                await turnContext.sendActivity(orderRecords.join('\n'));
+                console.log('Reminder sent');
+            });
+            
             console.log('Order closed');
             order.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
