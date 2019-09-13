@@ -112,7 +112,7 @@ class ProactiveBot extends ActivityHandler {
                     return;
                 }
 
-                if (quantity === 0) {
+                if (quantity === 0 || quantity >= 100) {
                     await context.sendActivity('Aigoooo đừng ghẹo e nữa mààà');
                     await next();
                     return;
@@ -328,7 +328,7 @@ class ProactiveBot extends ActivityHandler {
             paid: false,
         };
 
-        const answers = ['Đã nhận của', 'E nhớ rồi thưa', 'Được rồi ạ', 'Đã nhớ ', 'Vâng, tks', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ', 'Okie', 'Cám ơn', 'Thank you', 'Merci', 'Đã lưu', 'Đã xem'];
+        const answers = ['Đã nhận.', 'E nhớ rồi!', 'Được rồi ạ!', 'Đã nhớ!', 'Vâng~', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ~', 'Okie!', 'Cám ơn~', 'Thank you!', 'Merci~', 'Đã lưu', 'Đã xem'];
         const icons = ['(smilecat)', '(laughcat)', '(coolcat)', '(hearteyescat)'];
 
         const answer_i = Math.round(Math.random() * 100) % answers.length;
