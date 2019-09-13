@@ -192,20 +192,22 @@ class ProactiveBot extends ActivityHandler {
 
         const order = new CronJob(`0 ${minute} ${hour} * * *`, async () => {
             console.log('Order activated');
-            const total = Object.keys(this.orders).length;
 
             let orderRecords = [];
+            let total = 0;
             for (const order of Object.values(this.orders)) {
                 orderRecords.push(
-                    sprintf('%-30s %s', order.name, order.request)
+                    sprintf('%-30s %d %s', order.name, order.quantity, order.note)
                 );
+
+                total += quantity;
             }
 
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                 if (total > 0) {
                     await turnContext.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
                     await turnContext.sendActivity(orderRecords.join('\n'));
-                    await turnContext.sendActivity(`Tổng ${Object.keys(this.orders).length} suất`);
+                    await turnContext.sendActivity(`Tổng ${total} suất`);
                 } else {
                     await turnContext.sendActivity(`Huhu tổng hnay là 0 suất ;3;`);
                 }
@@ -247,14 +249,15 @@ class ProactiveBot extends ActivityHandler {
         console.log(`${activity.from.name} told me to setup group`);
     }
 
-    async placeOrder(context, next, orderContext) {
+    async placeOrder(context, next, quantity, note) {
         console.log(orderContext);
 
         const conversationReference = TurnContext.getConversationReference(context.activity);
         this.orders[conversationReference.user.id] = {
             conversationReference,
             name: context.activity.from.name,
-            request: orderContext,
+            quantity,
+            note
         };
 
         const answers = ['Đã nhận của', 'E nhớ rồi thưa', 'Được rồi ạ, cám ơn', 'Đã nhớ ', 'Vâng, tks', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ', 'Okie', 'Cám ơn', 'Thank you', 'Merci', 'Đã lưu', 'Đã xem'];
