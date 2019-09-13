@@ -237,7 +237,7 @@ class ProactiveBot extends ActivityHandler {
     async cancelOrder(context, next) {
         const conversationReference = TurnContext.getConversationReference(context.activity);
 
-        if (conversationReference.user.id in this.orders[conversationReference.user.id]) {
+        if (this.orders && conversationReference.user.id in this.orders[conversationReference.user.id]) {
             delete this.orders[conversationReference.user.id];
             await context.sendActivity(`Em đã xóa cơm của ${context.activity.from.name} ạ`);
         } else {
