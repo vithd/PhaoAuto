@@ -172,9 +172,7 @@ class ProactiveBot extends ActivityHandler {
     }
 
     isMaster(activity) {
-        console.log(activity)
-        console.log(this.adminConversationReferences)
-        const userId = activity.from.userId;
+        const userId = activity.from.id;
         return userId in this.adminConversationReferences;
     }
 
