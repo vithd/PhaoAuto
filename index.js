@@ -67,7 +67,7 @@ server.get('/api/chat', async (req, res) => {
     console.log(req.params);
 
     if (bot.groupConversationReference) {
-        await adapter.continueConversation(conversationReference, async turnContext => {
+        await adapter.continueConversation(bot.groupConversationReference, async turnContext => {
             await turnContext.sendActivity('proactive hello');
         });
     }
