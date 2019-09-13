@@ -68,14 +68,14 @@ class ProactiveBot extends ActivityHandler {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
-        if (text.indexOf('đây là group cơm') >= 0 || text.indexOf('하하') >= 0 || text.indexOf('khỏe không') >= 0) {
+        if (text.indexOf('đây là group cơm') >= 0 || text.indexOf('하하') >= 0 || text.indexOf('khỏe k') >= 0) {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
                 let message = 'Dạ, em nhớ rồi ạ';
 
                 if (text.indexOf('하하') >= 0) {
                     message = 'ㅋㅋㅋㅋ ^^~'
-                } else if (text.indexOf('khỏe không') >= 0)  {
+                } else if (text.indexOf('khỏe k') >= 0)  {
                     message = 'Dạ em khỏe ạ >:3'
                 }
 
@@ -100,9 +100,24 @@ class ProactiveBot extends ActivityHandler {
         }
 
         if (this.orderEnabled || true) {
-            const parseOrder = /Pháo Tự Động\s*(\d+.*)/.exec(context.activity.text);
-            if (parseOrder !== null && parseOrder[1]) {
-                await this.placeOrder(context, next, parseOrder[1]);
+            const parseOrder = /Pháo Tự Động\s*(\d+)(.*)/.exec(context.activity.text);
+            if (parseOrder !== null && parseOrder.length > 1) {
+                const quantity = parseInt(parseOrder[1]);
+                const note = parseOrder.length === 3 ? parseOrder[2] : '';
+
+                if (Number.isNan(quantity)) {
+                    await context.sendActivity('Sorry >~< Em không đọc được số lượng ạ, đặt lại giùm em nha');
+                    await next();
+                    return;
+                }
+
+                if (quantity === 0) {
+                    await context.sendActivity('Aigoooo đừng ghẹo e nữa mààà');
+                    await next();
+                    return;
+                }
+
+                await this.placeOrder(context, next, quantity, note);
                 return;
             }
 
