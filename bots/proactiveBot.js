@@ -177,11 +177,23 @@ class ProactiveBot extends ActivityHandler {
 
         const order = new CronJob(`0 ${minute} ${hour} * * *`, async () => {
             console.log('Order activated');
-            let orderRecords = ['meo', 'chuot'];
+            const total = Object.keys(this.orders).length;
+
+            let orderRecords = [];
+            for (const order of Object.values(this.orders)) {
+                orderRecords.push(
+                    sprintf('%-30s %s', order.name, order.request)
+                );
+            }
 
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
-                await turnContext.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
-                await turnContext.sendActivity(orderRecords.join('\n'));
+                if (total > 0) {
+                    await turnContext.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
+                    await turnContext.sendActivity(orderRecords.join('\n'));
+                    await turnContext.sendActivity(`Tổng ${Object.keys(this.orders).length} suất`);
+                } else {
+                    await turnContext.sendActivity(`Huhu tổng hnay là 0 suất ;3;`);
+                }
                 console.log('Order sent');
             });
             
@@ -279,7 +291,7 @@ Ex: @Pháo Tự Động 2 nhiều thịt ít rau (It means "more meat less veget
 How to cancel an order: @Pháo Tự Động cancel
 Ex: @Pháo Tự Động cancel
 
-How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
+How to pay: Put cash in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
 Ex: @Pháo Tự Động x`);
         }
 
