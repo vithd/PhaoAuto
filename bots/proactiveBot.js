@@ -84,7 +84,7 @@ class ProactiveBot extends ActivityHandler {
         }
 
         // Begin ordering sequences
-        if (this.isMaster(context.activity) && text.indexOf('giúp nhé') >= 0) {
+        if (this.isMaster(context.activity) && text.indexOf('chốt') >= 0 && text.indexOf('nhé') >= 0) {
             await this.openOrder(context, next);
             return;
         }
@@ -135,7 +135,6 @@ class ProactiveBot extends ActivityHandler {
         console.log(`Order at ${hour}:${minute}, remind at ${remindHour}:${remindMinute}`);
         
         const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * ${year}`, async function() {
-
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                 await turnContext.sendActivity(`
                     Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
@@ -148,12 +147,13 @@ class ProactiveBot extends ActivityHandler {
         }, null, true, 'Asia/Ho_Chi_Minh');
 
         const order = new CronJob(`0 ${minute} ${hour} * * ${year}`, async function() {
+            console.log('Order activate');
             let orderRecords = ['meo', 'chuot'];
 
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                 await turnContext.sendActivity(`Em chốt cơm nhé, đây là danh sách thưa chị chủ:`);
                 await turnContext.sendActivity(orderRecords.join('\n'));
-                console.log('Reminder sent');
+                console.log('Order sent');
             });
             
             console.log('Order closed');
