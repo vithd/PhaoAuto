@@ -109,19 +109,18 @@ class ProactiveBot extends ActivityHandler {
     }
 
     async openOrder(context, next) {
-        let parsedTime = /lúc (\d+)h(\d+)/gi.exec(context.activity.text);
+        let parsedTime = /(\d+)h(\d+)/gi.exec(context.activity.text);
         
         if (parsedTime === null || parsedTime.length !== 3) {
-            console.log('Cannot parse time in menu ' + context.activity.text);
+            console.log('Cannot parse time in Order message:' + context.activity.text);
             await context.sendActivity('Ơ chị Pháo ơi, em không đọc được giờ chốt ạ >~<');
-            await context.sendActivity('Chị nhớ ghi là "lúc 10h30" hay "13h00" e mới hiểu nha');
+            await context.sendActivity('Chị nhớ ghi là "10h30" hay "13h00" e mới hiểu nha');
             await next();
             return;
         }
         
         let hour = parseInt(parsedTime[1]),
-        minute = parseInt(parsedTime[2]),
-        year = new Date().getFullYear();
+            minute = parseInt(parsedTime[2]);
 
         let remindHour = hour,
             remindMinute = minute - this.reminderBefore;
@@ -133,8 +132,8 @@ class ProactiveBot extends ActivityHandler {
         
         this.orderEnabled = true;
         console.log(`Order at ${hour}:${minute}, remind at ${remindHour}:${remindMinute}`);
-        
-        const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * ${year}`, async function() {
+
+        const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async function() {
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                 await turnContext.sendActivity(`
                     Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
@@ -146,7 +145,7 @@ class ProactiveBot extends ActivityHandler {
             reminder.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        const order = new CronJob(`0 ${minute} ${hour} * * ${year}`, async function() {
+        const order = new CronJob(`0 ${minute} ${hour} * * *`, async function() {
             console.log('Order activate');
             let orderRecords = ['meo', 'chuot'];
 
