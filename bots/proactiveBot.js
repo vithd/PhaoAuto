@@ -69,7 +69,9 @@ class ProactiveBot extends ActivityHandler {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
-        if (text.indexOf('đây là group cơm nhé')) {
+        console.log(text)
+        console.log(text.indexOf('đây là group cơm'))
+        if (text.indexOf('đây là group cơm')) {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
                 await context.sendActivity('Dạ, em nhớ rồi ạ');
@@ -81,6 +83,7 @@ class ProactiveBot extends ActivityHandler {
             await next();
             return;
         }
+
         // Begin ordering sequences
         if (this.isMaster(context.activity) && text.indexOf('giúp nhé')) {
             await this.openOrder(context);
