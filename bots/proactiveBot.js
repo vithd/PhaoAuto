@@ -83,7 +83,7 @@ class ProactiveBot extends ActivityHandler {
         }
 
         // Begin ordering sequences
-        if (this.isMaster(context.activity) && text.indexOf('giúp nhé')) {
+        if (this.isMaster(context.activity) && text.indexOf('giúp nhé') >= 0) {
             await this.openOrder(context);
             return;
         }
@@ -178,6 +178,7 @@ class ProactiveBot extends ActivityHandler {
     }
 
     isMaster(activity) {
+        return true; // Debug
         const userId = activity.from.id;
         return userId in this.adminConversationReferences;
     }
