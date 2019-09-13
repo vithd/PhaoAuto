@@ -63,17 +63,29 @@ server.post('/api/messages', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-server.get('/api/chat', async (req, res) => {
-    console.log(req);
+const chatHTML = `<html><body>
+<form action="/api/chat">
+    <input type="text" name="chat" value="" placeholder="Type a message here">
+    <input type="submit" value="Submit">
+</form>
+</body></html>`;
 
-    if (bot.groupConversationReference) {
+server.get('/api/chat', async (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.writeHead(200);
+    res.write(chatHTML);
+    res.end();
+});
+
+server.post('/api/chat', async (req, res) => {
+    if (bot.groupConversationReference && req.params.chat) {
         await adapter.continueConversation(bot.groupConversationReference, async turnContext => {
-            await turnContext.sendActivity('proactive hello');
+            await turnContext.sendActivity(req.params.chat);
         });
     }
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
-    res.write(`<html><body>${req.params}</body></html>`);
+    res.write(chatHTML);
     res.end();
 });
