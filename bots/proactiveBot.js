@@ -41,8 +41,9 @@ class ProactiveBot extends ActivityHandler {
             for (let cnt = 0; cnt < membersAdded.length; cnt++) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id
                     && context.activity.conversation.isGroup) {
+                    console.log(context.activity);
                     const name = context.activity.from.name;
-                    const welcomeMessage = `Chao ${name}! Send me direct message for instruction ;)`;
+                    const welcomeMessage = `Welcome to Cơm Pháo! Send me direct message for instruction ;)`;
                     await context.sendActivity(welcomeMessage);
                 }
             }
