@@ -40,7 +40,7 @@ class ProactiveBot extends ActivityHandler {
             for (let cnt = 0; cnt < membersAdded.length; cnt++) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id
                     && context.activity.conversation.isGroup) {
-                    const name = context.activity.from.name;
+                    const name = context.activity.recipient.name;
                     const welcomeMessage = `Chao ${name}! Send me direct message for instruction ;)`;
                     await context.sendActivity(welcomeMessage);
                 }
@@ -52,16 +52,12 @@ class ProactiveBot extends ActivityHandler {
 
         this.onMessage(async (context, next) => {
             this.addConversationReference(context.activity);
-            console.log(context.activity)
             
-            if (context.activity.conversation.isGroup === false) {
-                await context.sendActivity('test');
-                await next();
-                this.directMessageHandler(context);
-                return;
+            if (context.activity.conversation.isGroup) {
+                return this.groupMessageHandler(context);
             }
             
-            return this.groupMessageHandler(context);
+            return this.directMessageHandler(context);
         });
     }
     
@@ -184,7 +180,7 @@ Send private message to Pháo Tự Động for instruction~`);
 
     async sendHelpMessage(context) {
         console.log('sendHelpMessage');
-        const name = context.activity.from.name;
+        const name = context.activity.recipient.name;
 
         await context.sendActivity(`Xin chào ${name}! Đây là Cơm Pháo~ Hàng ngày vào buổi sáng chị chủ Pháo sẽ gửi cơm vào group và hẹn giờ chốt cơm. Em sẽ mở đăng ký đến giờ chốt cơm, nhận tiền và báo nợ thay mặt chị chủ.
 
