@@ -38,7 +38,8 @@ class ProactiveBot extends ActivityHandler {
         this.onMembersAdded(async (context, next) => {
             const membersAdded = context.activity.membersAdded;
             for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-                if (membersAdded[cnt].id !== context.activity.recipient.id) {
+                if (membersAdded[cnt].id !== context.activity.recipient.id
+                    && context.activity.conversation.isGroup) {
                     const name = context.activity.from.name;
                     const welcomeMessage = `Chao ${name}! Send me direct message for instruction ;)`;
                     await context.sendActivity(welcomeMessage);
@@ -51,6 +52,7 @@ class ProactiveBot extends ActivityHandler {
 
         this.onMessage(async (context, next) => {
             this.addConversationReference(context.activity);
+            console.log(context.activity)
             
             if (context.activity.conversation.isGroup === false) {
                 await context.sendActivity('test');
