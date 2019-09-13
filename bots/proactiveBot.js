@@ -84,7 +84,7 @@ class ProactiveBot extends ActivityHandler {
 
         // Begin ordering sequences
         if (this.isMaster(context.activity) && text.indexOf('giúp nhé') >= 0) {
-            await this.openOrder(context);
+            await this.openOrder(context, next);
             return;
         }
     }
@@ -155,13 +155,11 @@ class ProactiveBot extends ActivityHandler {
             order.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        await context.sendActivity(`
-            Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước 10h30 nhé!
+        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước 10h30 nhé!
             Gửi tin nhắn riêng cho em để xem hướng dẫn na~
 
             Cơm Nhà Pháo is open for lunch registration, order ends at 10:30!
-            Send private message to Pháo Tự Động for instruction~
-            `);
+            Send private message to Pháo Tự Động for instruction~`);
         await next();
     }
 
