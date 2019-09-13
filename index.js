@@ -78,7 +78,7 @@ server.get('/chat', async (req, res) => {
 });
 
 server.post('/chat', async (req, res) => {
-    console.log(req.params);
+    console.log(req.body);
 
     if (bot.groupConversationReference && req.params.chat) {
         await adapter.continueConversation(bot.groupConversationReference, async turnContext => {
