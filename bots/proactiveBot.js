@@ -123,7 +123,9 @@ class ProactiveBot extends ActivityHandler {
                 await this.cancelOrder(context, next);
                 return;
             }
+        }
 
+        if (this.cronBill) {
             const parsePaid = /\s+x\s*/gi.exec(context.activity.text);
             if (parsePaid !== null) {
                 await this.payOrder(context, next);
