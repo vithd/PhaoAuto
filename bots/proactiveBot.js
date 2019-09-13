@@ -235,6 +235,8 @@ class ProactiveBot extends ActivityHandler {
     }
 
     async cancelOrder(context, next) {
+        const conversationReference = TurnContext.getConversationReference(context.activity);
+
         if (conversationReference.user.id in this.orders[conversationReference.user.id]) {
             delete this.orders[conversationReference.user.id];
             await context.sendActivity(`Em đã xóa cơm của ${context.activity.from.name} ạ`);
@@ -255,7 +257,7 @@ class ProactiveBot extends ActivityHandler {
             Cách đặt cơm: @phaotudong [so luong] [ghi chu]
             Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
             
-            Cách hủy cơm: @phaotudong huy
+            Cách hủy cơm: @phaotudong hủy
             Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
             
             Cách trả tiền: Bỏ tiền vào hộp tiền Cơm Nhà Pháo,tag Pháo Tự Động, thêm chữ x, ghi momo nếu dùng Momo
