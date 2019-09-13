@@ -10,7 +10,7 @@ class ProactiveBot extends ActivityHandler {
         super();
 
         this.adapter = adapter;
-        this.debug = false;
+        this.debug = true;
 
         // Master password to access administration features
         this.masterPassword = 'sinhnhatvuivenhavit';
