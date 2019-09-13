@@ -180,17 +180,19 @@ class ProactiveBot extends ActivityHandler {
         this.orderEnabled = true;
         console.log(`Order at ${rawHour}:${rawMinute}, remind at ${remindHour}:${remindMinute}`);
 
-        const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async () => {
+        // REMINDER
+        this.cronReminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async () => {
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                 await turnContext.sendActivity(`Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.`);
                 await turnContext.sendActivity(`Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.`);
                 console.log('Reminder sent');
             });
 
-            reminder.stop();
+            this.cronReminder.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        const order = new CronJob(`0 ${minute} ${hour} * * *`, async () => {
+        // ORDER
+        this.cronOrder = new CronJob(`0 ${minute} ${hour} * * *`, async () => {
             console.log('Order activated');
 
             let orderRecords = [];
@@ -215,8 +217,41 @@ class ProactiveBot extends ActivityHandler {
             });
             
             this.orderEnabled = false;
-            order.stop();
+            this.cronOrder.stop();
             console.log('Order closed');
+        }, null, true, 'Asia/Ho_Chi_Minh');
+        
+        // THE BILL COMES DUE
+        let billHour = hour,
+            billMinute = (minute + 1) % 60;
+
+        if (billMinute < minute) {
+            billHour += 1;
+        }
+
+        this.cronBill = new CronJob(`0 ${billMinute} ${billHour} * * *`, async () => {
+            console.log('The bill comes due');
+
+            let orderRecords = [];
+            let total = 0;
+            for (const order of Object.values(this.orders)) {
+                orderRecords.push(
+                    sprintf('%-30s %d %s', order.name, order.quantity, order.note)
+                );
+
+                total += quantity;
+            }
+
+            if (total > 0) {
+                await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
+                    await turnContext.sendActivity(`Các anh chị ơi đóng tiền giúp em với ạ`);
+                    await turnContext.sendActivity(orderRecords.join('\n'));
+                    await turnContext.sendActivity(`Tổng nợ ${total} suất`);
+                });
+            }
+
+            this.cronBill.stop();
+            
         }, null, true, 'Asia/Ho_Chi_Minh');
 
         await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${rawHour}h${rawMinute} nhé! PM riêng cho em để xem hướng dẫn na~`);
@@ -260,14 +295,19 @@ class ProactiveBot extends ActivityHandler {
             note
         };
 
-        const answers = ['Đã nhận của', 'E nhớ rồi thưa', 'Được rồi ạ, cám ơn', 'Đã nhớ ', 'Vâng, tks', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ', 'Okie', 'Cám ơn', 'Thank you', 'Merci', 'Đã lưu', 'Đã xem'];
+        const answers = ['Đã nhận của', 'E nhớ rồi thưa', 'Được rồi ạ', 'Đã nhớ ', 'Vâng, tks', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ', 'Okie', 'Cám ơn', 'Thank you', 'Merci', 'Đã lưu', 'Đã xem'];
         const icons = ['(smilecat)', '(laughcat)', '(coolcat)', '(hearteyescat)'];
 
         const answer_i = Math.round(Math.random() * 100) % answers.length;
         const icon_i = Math.round(Math.random() * 100) % icons.length;
         const icon = Math.round(Math.random() * 100) % 3 === 1 ? icons[icon_i] : '';
 
-        await context.sendActivity(`${answers[answer_i]} ${context.activity.from.name} ${icon}`);
+        let answer = answers[answer_i];
+        if (Math.round(Math.random() * 1000) === 69) {
+            answer = 'Woaaaaa, bất ngờ chưa! Suất may mắn này free cho';
+        }
+
+        await context.sendActivity(`${answer} ${context.activity.from.name} ${quantity} suất (${note}) ${icon}`);
         await next();
     }
 
