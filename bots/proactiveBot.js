@@ -27,6 +27,7 @@ class ProactiveBot extends ActivityHandler {
         this.adminConversationReferences = {};
         this.groupConversationReference = null;
         this.orderEnabled = false;
+        this.orders = {};
         this.reminderBefore = 5; // minutes
 
         this.onConversationUpdate(async (context, next) => {
@@ -89,8 +90,17 @@ class ProactiveBot extends ActivityHandler {
         }
 
         // Begin ordering sequences
-        if (this.isMaster(context.activity) && text.indexOf('chốt') >= 0 && text.indexOf('nhé') >= 0) {
+        if (this.isMaster(context.activity) && 
+            (text.indexOf('chốt') >= 0 || text.indexOf('lúc') >= 0
+            || text.indexOf('nhờ') >= 0 || text.indexOf('giúp') >= 0) 
+            && text.indexOf('nhé') >= 0
+        ) {
             await this.openOrder(context, next);
+            return;
+        }
+
+        if (this.orderEnabled || true) {
+            await this.placeOrder(context, next);
             return;
         }
     }
@@ -124,7 +134,9 @@ class ProactiveBot extends ActivityHandler {
             return;
         }
         
-        let hour = parseInt(parsedTime[1]),
+        let rawHour = parsedTime[1], // to keep leading zero in message
+            rawMinute = parsedTime[1], // to keep leading zero in message
+            hour = parseInt(parsedTime[1]),
             minute = parseInt(parsedTime[2]);
 
         let remindHour = hour,
@@ -136,14 +148,12 @@ class ProactiveBot extends ActivityHandler {
         }
         
         this.orderEnabled = true;
-        console.log(`Order at ${hour}:${minute}, remind at ${remindHour}:${remindMinute}`);
+        console.log(`Order at ${rawHour}:${rawMinute}, remind at ${remindHour}:${remindMinute}`);
 
         const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async () => {
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
-                await turnContext.sendActivity(`
-                    Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
-                    Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.
-                `);
+                await turnContext.sendActivity(`Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.`);
+                await turnContext.sendActivity(`Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.`);
                 console.log('Reminder sent');
             });
 
@@ -151,7 +161,7 @@ class ProactiveBot extends ActivityHandler {
         }, null, true, 'Asia/Ho_Chi_Minh');
 
         const order = new CronJob(`0 ${minute} ${hour} * * *`, async () => {
-            console.log('Order activate');
+            console.log('Order activated');
             let orderRecords = ['meo', 'chuot'];
 
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
@@ -160,12 +170,13 @@ class ProactiveBot extends ActivityHandler {
                 console.log('Order sent');
             });
             
-            console.log('Order closed');
+            this.orderEnabled = false;
             order.stop();
+            console.log('Order closed');
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${hour}h${minute} nhé! PM riêng cho em để xem hướng dẫn na~`);
-        await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${hour}:${minute}! Drop me a private message for instruction~`);
+        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${rawHour}h${rawMinute} nhé! PM riêng cho em để xem hướng dẫn na~`);
+        await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${rawHour}:${rawMinute}! Drop me a private message for instruction~`);
         await next();
     }
 
@@ -192,6 +203,27 @@ class ProactiveBot extends ActivityHandler {
         this.groupConversationReference = conversationReference;
 
         console.log(`${activity.from.name} told me to setup group`);
+    }
+
+    async placeOrder(context, next) {
+        console.log(context.activity.text);
+
+        const conversationReference = TurnContext.getConversationReference(context.activity);
+        this.orders[conversationReference.user.id] = {
+            conversationReference,
+            name: context.activity.from.name,
+            request: context.activity.text,
+        };
+
+        const answers = ['Đã nhận của', 'E nhớ rồi thưa', 'Được rồi ạ, cám ơn', 'Đã nhớ ', 'Vâng, tks', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ', 'Okie', 'Cám ơn', 'Thank you', 'Merci', 'Đã lưu', 'Đã xem'];
+        const icons = ['(smilecat)', '(laughcat)', '(coolcat)', '(hearteyescat)'];
+
+        const answer_i = Math.round(Math.random() * 100) % answers.length;
+        const icon_i = Math.round(Math.random() * 100) % icons.length;
+        const icon = Math.round(Math.random() * 100) % 3 === 1 ? icons[icon_i] : '';
+
+        await context.sendActivity(`${answers[answer_i]} ${context.activity.from.name} ${icon}`);
+        await next();
     }
 
     async sendHelpMessage(context, next, language = 'VN') {
