@@ -70,14 +70,14 @@ const chatHTML = `<html><body>
 </form>
 </body></html>`;
 
-server.get('/api/chat', async (req, res) => {
+server.get('/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
     res.write(chatHTML);
     res.end();
 });
 
-server.post('/api/chat', async (req, res) => {
+server.post('/chat', async (req, res) => {
     if (bot.groupConversationReference && req.params.chat) {
         await adapter.continueConversation(bot.groupConversationReference, async turnContext => {
             await turnContext.sendActivity(req.params.chat);
