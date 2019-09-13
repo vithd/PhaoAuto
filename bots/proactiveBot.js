@@ -333,7 +333,8 @@ class ProactiveBot extends ActivityHandler {
             answer = 'Woaaaaa, bất ngờ chưa! Suất may mắn này free cho';
         }
 
-        await context.sendActivity(`${answer} ${context.activity.from.name} ${quantity} suất (${note}) ${icon}`);
+        note = note ? `(${note})` : '';
+        await context.sendActivity(`${answer} ${context.activity.from.name} ${quantity} suất ${note} ${icon}`);
         await next();
     }
 
