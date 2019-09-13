@@ -288,6 +288,11 @@ class ProactiveBot extends ActivityHandler {
         console.log(`${context.activity.from.name} - ${quantity} - ${note}`);
 
         const conversationReference = TurnContext.getConversationReference(context.activity);
+
+        if (this.groupConversationReference === null) {
+            this.groupConversationReference = conversationReference;
+        }
+
         this.orders[conversationReference.user.id] = {
             conversationReference,
             name: context.activity.from.name,
