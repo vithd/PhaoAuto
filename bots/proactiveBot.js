@@ -40,7 +40,7 @@ class ProactiveBot extends ActivityHandler {
             for (let cnt = 0; cnt < membersAdded.length; cnt++) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id
                     && context.activity.conversation.isGroup) {
-                    const name = context.activity.recipient.name;
+                    const name = context.activity.from.name;
                     const welcomeMessage = `Chao ${name}! Send me direct message for instruction ;)`;
                     await context.sendActivity(welcomeMessage);
                 }
@@ -53,7 +53,7 @@ class ProactiveBot extends ActivityHandler {
         this.onMessage(async (context, next) => {
             this.addConversationReference(context.activity);
             console.log(context.activity);
-            
+
             if (context.activity.conversation.isGroup) {
                 return this.groupMessageHandler(context, next);
             }
@@ -69,6 +69,7 @@ class ProactiveBot extends ActivityHandler {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
+        console.log('isMaster ' + this.isMaster(context.activity));
         if (this.isMaster(context.activity)) {
             if (text.indexOf('đây là group cơm nhé')) {
                 this.setGroupConversationReference(context.activity);
@@ -128,8 +129,10 @@ class ProactiveBot extends ActivityHandler {
         this.orderEnabled = true;
         
         const reminder = new CronJob(`0 ${minute} ${hour} * * *`, async function() {
-            await context.sendActivity(`Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
-Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.`);
+            await context.sendActivity(`
+                Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
+                Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes left.
+            `);
             await next();
 
             console.log('Reminder sent');
@@ -146,11 +149,13 @@ Nhà Pháo is closing lunch registration! Only ${this.reminderBefore} minutes le
             order.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước 10h30 nhé!
-		Gửi tin nhắn riêng cho em để xem hướng dẫn na~
+        await context.sendActivity(`
+            Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước 10h30 nhé!
+            Gửi tin nhắn riêng cho em để xem hướng dẫn na~
 
-Cơm Nhà Pháo is open for lunch registration, order ends at 10:30!
-Send private message to Pháo Tự Động for instruction~`);
+            Cơm Nhà Pháo is open for lunch registration, order ends at 10:30!
+            Send private message to Pháo Tự Động for instruction~
+            `);
         await next();
     }
 
@@ -178,31 +183,36 @@ Send private message to Pháo Tự Động for instruction~`);
         console.log(`${activity.from.name} told me this is the group`);
     }
 
-    async sendHelpMessage(context, next) {
+    async sendHelpMessage(context, next, language = 'VN') {
         console.log('sendHelpMessage');
-        const name = context.activity.recipient.name;
+        const name = context.activity.from.name;
 
-        await context.sendActivity(`Xin chào ${name}! Đây là Cơm Pháo~ Hàng ngày vào buổi sáng chị chủ Pháo sẽ gửi cơm vào group và hẹn giờ chốt cơm. Em sẽ mở đăng ký đến giờ chốt cơm, nhận tiền và báo nợ thay mặt chị chủ.
+        if (language === 'VN') {
+            await context.sendActivity(`Xin chào ${name}! Đây là Cơm Pháo~ Hàng ngày vào buổi sáng chị chủ Pháo sẽ gửi cơm vào group và hẹn giờ chốt cơm. Em sẽ mở đăng ký đến giờ chốt cơm, nhận tiền và báo nợ thay mặt chị chủ.
+    
+            Cách đặt cơm: @phaotudong [so luong] [ghi chu]
+            Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
+            
+            Cách hủy cơm: @phaotudong huy
+            Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
+            
+            Cách trả tiền: Bỏ tiền vào hộp tiền Cơm Nhà Pháo,tag Pháo Tự Động, thêm chữ x, ghi momo nếu dùng Momo
+            Ví dụ "@Pháo Tự Động x" hoặc "@Pháo Tự Động x momo"
+    
+            For *English instruction* please type "lol"`);
+        } else {
+            await context.sendActivity(`Hallo ${name}! This is Cơm Pháo Lunch~ Everyday in morning my master will send lunch menu to the group. I'll open registration, take payment and remind paying at the end of the day.
+    
+            How to order: @Pháo Tự Động [quatity] [note]
+            Ex: @Pháo Tự Động 2 nhiều thịt ít rau (It means "more meat less veget")
+            
+            How to cancel an order: @Pháo Tự Động cancel
+            Ex: @Pháo Tự Động cancel
+            
+            How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
+            Ex: @Pháo Tự Động x`);
+        }
 
-Cách đặt cơm: @phaotudong [so luong] [ghi chu]
-Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
-
-Cách hủy cơm: @phaotudong huy
-Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
-
-Cách trả tiền: Bỏ tiền vào hộp tiền Cơm Nhà Pháo,tag Pháo Tự Động, thêm chữ x, ghi momo nếu dùng Momo
-Ví dụ "@Pháo Tự Động x" hoặc "@Pháo Tự Động x momo"`);
-
-        await context.sendActivity(`Hallo ${name}! This is Cơm Pháo Lunch~ Everyday in morning my master will send lunch menu to the group. I'll open registration, take payment and remind paying at the end of the day.
-
-How to order: @Pháo Tự Động [quatity] [note]
-Ex: @Pháo Tự Động 2 nhiều thịt ít rau (It means "more meat less veget")
-
-How to cancel an order: @Pháo Tự Động cancel
-Ex: @Pháo Tự Động cancel
-
-How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
-Ex: @Pháo Tự Động x`);
 
         await next();
     }
