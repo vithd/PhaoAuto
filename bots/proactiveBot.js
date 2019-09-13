@@ -5,19 +5,12 @@ const { ActivityHandler, TurnContext } = require('botbuilder');
 const sprintf = require('sprintf-js').sprintf;
 const CronJob = require('cron').CronJob;
 
-/*
-const order = new CronJob('* 30 10 * * *', function() {
-    console.log('You will see this message every second');
-    order.stop();
-}, null, true, 'Asia/Ho_Chi_Minh');
-*/
-
 class ProactiveBot extends ActivityHandler {
     constructor(conversationReferences, adapter) {
         super();
 
         this.adapter = adapter;
-        this.debug = true;
+        this.debug = false;
 
         // Master password to access administration features
         this.masterPassword = 'sinhnhatvuivenhavit';
@@ -131,7 +124,7 @@ class ProactiveBot extends ActivityHandler {
                 return;
             }
 
-            const parsePaid = /\s+x\s*/g.exec(context.activity.text);
+            const parsePaid = /\s+x\s*/gi.exec(context.activity.text);
             if (parsePaid !== null) {
                 await this.payOrder(context, next);
                 return;
