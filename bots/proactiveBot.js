@@ -40,7 +40,7 @@ class ProactiveBot extends ActivityHandler {
             for (let cnt = 0; cnt < membersAdded.length; cnt++) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id) {
                     const name = context.activity.from.name;
-                    const welcomeMessage = `Ciao ${name}! Send me direct message for instruction ;)`;
+                    const welcomeMessage = `Chao ${name}! Send me direct message for instruction ;)`;
                     await context.sendActivity(welcomeMessage);
                 }
             }
@@ -53,7 +53,10 @@ class ProactiveBot extends ActivityHandler {
             this.addConversationReference(context.activity);
             
             if (context.activity.conversation.isGroup === false) {
-                return this.directMessageHandler(context);
+                await context.sendActivity('test');
+                await next();
+                this.directMessageHandler(context);
+                return;
             }
             
             return this.groupMessageHandler(context);
