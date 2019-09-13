@@ -126,9 +126,16 @@ class ProactiveBot extends ActivityHandler {
             await next();
             return;
         }
-
+        
         // Help message
+        if (text === 'lol') {
+            await this.sendHelpMessage(context, next, 'EN');
+            await next();
+            return;
+        }
+
         await this.sendHelpMessage(context, next);
+        await next();
     }
 
     async openOrder(context, next) {
@@ -241,14 +248,13 @@ class ProactiveBot extends ActivityHandler {
             delete this.orders[conversationReference.user.id];
             await context.sendActivity(`Em đã xóa cơm của ${context.activity.from.name} ạ`);
         } else {
-            await context.sendActivity('Ơ nhưng mà e chưa thấy ${context.activity.from.name} đăng ký ;_;');
+            await context.sendActivity(`Ơ nhưng mà e chưa thấy ${context.activity.from.name} đăng ký ;_;`);
         }
            
         await next();
     }
 
     async sendHelpMessage(context, next, language = 'VN') {
-        console.log('sendHelpMessage');
         const name = context.activity.from.name;
 
         if (language === 'VN') {
