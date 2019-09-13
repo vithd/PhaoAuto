@@ -52,7 +52,7 @@ class ProactiveBot extends ActivityHandler {
 
         this.onMessage(async (context, next) => {
             this.addConversationReference(context.activity);
-            console.log(context.activity);
+            // console.log(context.activity);
 
             if (context.activity.conversation.isGroup) {
                 return this.groupMessageHandler(context, next);
@@ -172,6 +172,8 @@ class ProactiveBot extends ActivityHandler {
     }
 
     isMaster(activity) {
+        console.log(activity)
+        console.log(this.adminConversationReferences)
         const userId = activity.from.userId;
         return userId in this.adminConversationReferences;
     }
