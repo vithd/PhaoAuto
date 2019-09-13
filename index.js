@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const restify = require('restify');
+const sprintf = require('sprintf-js').sprintf;
 
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
 const { BotFrameworkAdapter } = require('botbuilder');
@@ -63,22 +64,12 @@ server.post('/api/messages', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-const chatHTML = `<html>
-<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body>
-    <form action="/chat" method="POST">
-        <input type="text" name="chat" value="" placeholder="Type a message here" autocomplete="off" autofocus>
-        <input type="submit" value="Submit">
-    </form>
-    </body>
-</html>`;
-
 server.use(restify.plugins.bodyParser());
 
 server.get('/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
-    res.write(chatHTML);
+    res.write(sprintf(chatHTML, bot.groupConversationReference ? 'OK' : 'Unset'));
     res.end();
 });
 
@@ -94,6 +85,41 @@ server.post('/chat', async (req, res) => {
 
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
-    res.write(chatHTML);
+    res.write(sprintf(chatHTML, bot.groupConversationReference ? 'OK' : 'Unset'));
     res.end();
 });
+
+const chatHTML = `<html>
+<head>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #e67664;
+        }
+
+        #chat {
+            width: 300px;
+            display: block;
+            margin-bottom: 16px;
+            height: 40px;
+            border: 1px dashed #d43a3add;
+            padding: 5px 8px;
+        }
+
+        button {
+            float: right;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+<form action="/chat" method="POST">
+    <label>Group connection: %s</label>
+    <input type="text" name="chat" id="chat" value="" placeholder="Type a message here" autocomplete="off" autofocus>
+    <button type="submit">Send</button>
+</form>
+</body>
+</html>`;
