@@ -267,11 +267,10 @@ class ProactiveBot extends ActivityHandler {
                     await turnContext.sendActivity(orderRecords.join('\n'));
                     await turnContext.sendActivity(`Tổng nợ ${total} suất`);
                 });
-            } else {
-                // Reset Order
-                this.orders = {}
             }
 
+            // Reset Order
+            this.orders = {}
             this.cronBill.stop();
             
         }, null, true, 'Asia/Ho_Chi_Minh');
