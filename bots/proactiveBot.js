@@ -192,7 +192,6 @@ class ProactiveBot extends ActivityHandler {
         }
         
         this.orderEnabled = true;
-        console.log(`Order at ${rawHour}:${rawMinute}, remind at ${remindHour}:${remindMinute}`);
 
         // REMINDER
         this.cronReminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async () => {
@@ -280,6 +279,8 @@ class ProactiveBot extends ActivityHandler {
         await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${rawHour}h${rawMinute} nhé! PM riêng cho em để xem hướng dẫn na~`);
         await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${rawHour}:${rawMinute}! Drop me a private message for instruction~`);
         await next();
+
+        console.log(`Order at ${rawHour}:${rawMinute}, remind at ${remindHour}:${remindMinute}, bill comes at ${billHour}:${billMinute}`);
     }
 
     addConversationReference(activity) {
