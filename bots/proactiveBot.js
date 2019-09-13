@@ -165,6 +165,7 @@ class ProactiveBot extends ActivityHandler {
         this.cronReminder && this.cronBill.stop();
         this.cronOrder && this.cronOrder.stop();
         this.cronBill && this.cronBill.stop();
+        this.orders = {};
     }
 
     async openOrder(context, next) {
