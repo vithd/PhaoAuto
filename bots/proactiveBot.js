@@ -69,20 +69,22 @@ class ProactiveBot extends ActivityHandler {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
-        console.log('isMaster ' + this.isMaster(context.activity));
-        if (this.isMaster(context.activity)) {
-            if (text.indexOf('đây là group cơm nhé')) {
+        if (text.indexOf('đây là group cơm nhé')) {
+            if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
                 await context.sendActivity('Dạ, em nhớ rồi ạ');
                 await next();
                 return;
             }
-            
-            // Begin ordering sequences
-            if (text.indexOf('giúp nhé')) {
-                await this.openOrder(context);
-                return;
-            }
+
+            await context.sendActivity('Ơ ai đấy ạ? Em không quen');
+            await next();
+            return;
+        }
+        // Begin ordering sequences
+        if (this.isMaster(context.activity) && text.indexOf('giúp nhé')) {
+            await this.openOrder(context);
+            return;
         }
     }
     
@@ -180,7 +182,7 @@ class ProactiveBot extends ActivityHandler {
         const conversationReference = TurnContext.getConversationReference(activity);
         this.groupConversationReference = conversationReference;
 
-        console.log(`${activity.from.name} told me this is the group`);
+        console.log(`${activity.from.name} told me to setup group`);
     }
 
     async sendHelpMessage(context, next, language = 'VN') {
