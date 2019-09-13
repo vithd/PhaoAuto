@@ -27,8 +27,8 @@ var https_options = {
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about adapters.
 const adapter = new BotFrameworkAdapter({
-    appId: process.env.MicrosoftAppId,
-    appPassword: process.env.MicrosoftAppPassword
+    appId: 'e0c075de-b966-4350-aac2-0f415c219d01',
+    appPassword: '.Fw-8/wV]PA3kB6rL2[MPxvU=MV3bo=L'
 });
 
 // Catch-all for errors.
