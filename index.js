@@ -17,6 +17,12 @@ const { ProactiveBot } = require('./bots/proactiveBot');
 const ENV_FILE = path.join(__dirname, '.env');
 require('dotenv').config({ path: ENV_FILE });
 
+// Create HTTP server
+var https_options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/tungnt8.com-0001/privkey.pem'),
+    certificate: fs.readFileSync('/etc/letsencrypt/live/tungnt8.com-0001/fullchain.pem')
+};
+
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about adapters.
 const adapter = new BotFrameworkAdapter({
@@ -39,7 +45,7 @@ const conversationReferences = {};
 const bot = new ProactiveBot(conversationReferences);
 
 // Create HTTP server.
-const server = restify.createServer();
+const server = restify.createServer(https_options);
 server.listen(process.env.port || process.env.PORT || 8401, function() {
     console.log(`\n${ server.name } listening to ${ server.url }`);
     // console.log(`\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator`);
