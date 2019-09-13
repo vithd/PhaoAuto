@@ -7,8 +7,8 @@ const CronJob = require('cron').CronJob;
 
 /*
 const order = new CronJob('* 30 10 * * *', function() {
-  console.log('You will see this message every second');
-  order.stop();
+    console.log('You will see this message every second');
+    order.stop();
 }, null, true, 'Asia/Ho_Chi_Minh');
 */
 
@@ -71,13 +71,15 @@ class ProactiveBot extends ActivityHandler {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
-        if (text.indexOf('đây là group cơm') >= 0 || text.indexOf('하하') >= 0) {
+        if (text.indexOf('đây là group cơm') >= 0 || text.indexOf('하하') >= 0 || text.indexOf('khỏe không') >= 0) {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
                 let message = 'Dạ, em nhớ rồi ạ';
 
                 if (text.indexOf('하하') >= 0) {
                     message = 'ㅋㅋㅋㅋ ^^~'
+                } else if (text.indexOf('khỏe không') >= 0)  {
+                    message = 'Dạ em khỏe ạ >:3'
                 }
 
                 await context.sendActivity(message);

@@ -63,12 +63,15 @@ server.post('/api/messages', (req, res) => {
 });
 
 // Listen for incoming notifications and send proactive messages to users.
-const chatHTML = `<html><body>
-<form action="/chat" method="POST">
-    <input type="text" name="chat" value="" placeholder="Type a message here" autocomplete="off" autofocus>
-    <input type="submit" value="Submit">
-</form>
-</body></html>`;
+const chatHTML = `<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body>
+    <form action="/chat" method="POST">
+        <input type="text" name="chat" value="" placeholder="Type a message here" autocomplete="off" autofocus>
+        <input type="submit" value="Submit">
+    </form>
+    </body>
+</html>`;
 
 server.use(restify.plugins.bodyParser());
 
