@@ -131,7 +131,7 @@ class ProactiveBot extends ActivityHandler {
                 return;
             }
 
-            const parsePaid = /\s+x\s+/g.exec(context.activity.text);
+            const parsePaid = /\s+x\s*/g.exec(context.activity.text);
             if (parsePaid !== null) {
                 await this.payOrder(context, next);
                 return;
@@ -239,14 +239,16 @@ class ProactiveBot extends ActivityHandler {
         }, null, true, 'Asia/Ho_Chi_Minh');
         
         // THE BILL COMES DUE
-        // let billHour = hour,
-        //     billMinute = (minute + 1) % 60;
-
-        // if (billMinute < minute) {
-        //     billHour += 1;
-        // }
-
-        let billHour = 17, billMinute = 0;
+        if (this.debug) {
+            var billHour = hour,
+                billMinute = (minute + 1) % 60;
+    
+            if (billMinute < minute) {
+                billHour += 1;
+            }
+        } else {
+            var billHour = 17, billMinute = 0;
+        }
 
         this.cronBill = new CronJob(`0 ${billMinute} ${billHour} * * *`, async () => {
             console.log('The bill comes due');
@@ -358,12 +360,11 @@ class ProactiveBot extends ActivityHandler {
 
         if (conversationReference.user.id in this.orders) {
             this.orders[conversationReference.user.id].paid = true;
-
             await context.sendActivity(`${context.activity.from.name} đã đóng tiền~`);
 
             // Everyone paid, says thanks and cancel The Bill comes due
             let allPaid = true;
-            for (order of Object.values(this.orders)) {
+            for (const order of Object.values(this.orders)) {
                 if (order.paid === false) {
                     allPaid = false;
                     break;
