@@ -54,17 +54,17 @@ class ProactiveBot extends ActivityHandler {
             this.addConversationReference(context.activity);
             
             if (context.activity.conversation.isGroup) {
-                return this.groupMessageHandler(context);
+                return this.groupMessageHandler(context, next);
             }
             
-            return this.directMessageHandler(context);
+            return this.directMessageHandler(context, next);
         });
     }
     
     //
     // Group Message
     //
-    async groupMessageHandler(context) {
+    async groupMessageHandler(context, next) {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
@@ -78,7 +78,7 @@ class ProactiveBot extends ActivityHandler {
             
             // Begin ordering sequences
             if (text.indexOf('giúp nhé')) {
-                this.openOrder(context);
+                await this.openOrder(context);
                 return;
             }
         }
@@ -87,7 +87,7 @@ class ProactiveBot extends ActivityHandler {
     //
     // Direct Message
     //
-    async directMessageHandler(context) {
+    async directMessageHandler(context, next) {
         const text = context.activity.text.toLowerCase().trim();
         console.log(text);
 
@@ -103,7 +103,7 @@ class ProactiveBot extends ActivityHandler {
         await this.sendHelpMessage(context);
     }
 
-    async openOrder(context) {
+    async openOrder(context, next) {
         const parsedTime = this.timePattern.exec(context.activity.text);
         
         if (parsedTime.length !== 3) {
@@ -178,7 +178,7 @@ Send private message to Pháo Tự Động for instruction~`);
         console.log(`${activity.from.name} told me this is the group`);
     }
 
-    async sendHelpMessage(context) {
+    async sendHelpMessage(context, next) {
         console.log('sendHelpMessage');
         const name = context.activity.recipient.name;
 
