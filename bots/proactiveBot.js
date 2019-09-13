@@ -13,8 +13,10 @@ const order = new CronJob('* 30 10 * * *', function() {
 */
 
 class ProactiveBot extends ActivityHandler {
-    constructor(conversationReferences) {
+    constructor(conversationReferences, adapter) {
         super();
+
+        this.adapter = adapter;
 
         // Master password to access administration features
         this.masterPassword = 'sinhnhatvuivenhavit';
@@ -70,6 +72,11 @@ class ProactiveBot extends ActivityHandler {
         if (text.indexOf('đây là group cơm') >= 0) {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
+
+                await adapter.continueConversation(this.groupConversationReference, async turnContext => {
+                    await turnContext.sendActivity('proactive hello');
+                });
+
                 await context.sendActivity('Dạ, em nhớ rồi ạ');
                 await next();
                 return;
@@ -153,10 +160,8 @@ class ProactiveBot extends ActivityHandler {
             order.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${hour}h${minute} nhé! PM riêng cho em để xem hướng dẫn na~
-
-Cơm Nhà Pháo is open for lunch registration, order ends at ${hour}:${minute}!
-Send private message to Pháo Tự Động for instruction~`);
+        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${hour}h${minute} nhé! PM riêng cho em để xem hướng dẫn na~`);
+        await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${hour}:${minute}! Drop me a private message for instruction~`);
         await next();
     }
 

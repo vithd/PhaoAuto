@@ -32,12 +32,12 @@ adapter.onTurnError = async (context, error) => {
     //       application insights.
     console.error(`\n [onTurnError]: ${ error }`);
     // Send a message to the user
-    await context.sendActivity(`Oops. Something went wrong!`);
+    await context.sendActivity(`Ui! Em bị lỗi rồi >_<"`);
 };
 
 // Create the main dialog.
 const conversationReferences = {};
-const bot = new ProactiveBot(conversationReferences);
+const bot = new ProactiveBot(conversationReferences, adapter);
 
 // Create HTTP server.
 let server = null;
