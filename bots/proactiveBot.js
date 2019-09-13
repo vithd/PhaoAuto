@@ -126,7 +126,7 @@ class ProactiveBot extends ActivityHandler {
             remindMinute = minute - this.reminderBefore;
 
         if (remindMinute < 0) {
-            remindHour = (closeHour - 1) % 24;
+            remindHour = (remindHour - 1) % 24;
             remindMinute = (minute - this.reminderBefore) % 60;
         }
         
