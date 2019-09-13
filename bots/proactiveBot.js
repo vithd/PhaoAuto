@@ -133,7 +133,7 @@ class ProactiveBot extends ActivityHandler {
         this.orderEnabled = true;
         console.log(`Order at ${hour}:${minute}, remind at ${remindHour}:${remindMinute}`);
 
-        const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async function() {
+        const reminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async () => {
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                 await turnContext.sendActivity(`
                     Nhà Pháo chuẩn bị chốt cơm nhaaa! Chỉ còn ${this.reminderBefore} phút nữa thôi ạ.
@@ -145,7 +145,7 @@ class ProactiveBot extends ActivityHandler {
             reminder.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        const order = new CronJob(`0 ${minute} ${hour} * * *`, async function() {
+        const order = new CronJob(`0 ${minute} ${hour} * * *`, async () => {
             console.log('Order activate');
             let orderRecords = ['meo', 'chuot'];
 
