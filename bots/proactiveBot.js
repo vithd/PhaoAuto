@@ -69,9 +69,7 @@ class ProactiveBot extends ActivityHandler {
         const text = context.activity.text.toLowerCase().trim();
 
         // Admin commands
-        console.log(text)
-        console.log(text.indexOf('đây là group cơm'))
-        if (text.indexOf('đây là group cơm')) {
+        if (text.indexOf('đây là group cơm') >= 0) {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
                 await context.sendActivity('Dạ, em nhớ rồi ạ');
