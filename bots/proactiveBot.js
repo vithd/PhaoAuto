@@ -166,9 +166,7 @@ class ProactiveBot extends ActivityHandler {
 
     addAdminConversationReference(activity) {
         const conversationReference = TurnContext.getConversationReference(activity);
-        console.log('conversationReference')
-        console.log(conversationReference)
-        this.adminConversationReferences[conversationReference.from.id] = conversationReference;
+        this.adminConversationReferences[conversationReference.user.id] = conversationReference;
 
         console.log(`${activity.from.name} is my master`);
     }
