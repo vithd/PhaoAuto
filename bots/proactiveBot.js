@@ -25,8 +25,6 @@ class ProactiveBot extends ActivityHandler {
         this.adminConversationReferences = {};
         this.groupConversationReference = null;
         this.orderEnabled = false;
-
-        this.timePattern = /lúc (\d+)h(\d+)/gi;
         this.reminderBefore = 5; // minutes
 
         this.onConversationUpdate(async (context, next) => {
@@ -108,7 +106,7 @@ class ProactiveBot extends ActivityHandler {
     }
 
     async openOrder(context, next) {
-        const parsedTime = this.timePattern.exec(context.activity.text);
+        let parsedTime = /lúc (\d+)h(\d+)/gi.exec(context.activity.text);
         console.log(context.activity.text);
         console.log(parsedTime);
         
@@ -155,11 +153,10 @@ class ProactiveBot extends ActivityHandler {
             order.stop();
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước 10h30 nhé!
-            Gửi tin nhắn riêng cho em để xem hướng dẫn na~
+        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${hour}h${minute} nhé! PM riêng cho em để xem hướng dẫn na~
 
-            Cơm Nhà Pháo is open for lunch registration, order ends at 10:30!
-            Send private message to Pháo Tự Động for instruction~`);
+Cơm Nhà Pháo is open for lunch registration, order ends at ${hour}:${minute}!
+Send private message to Pháo Tự Động for instruction~`);
         await next();
     }
 
