@@ -137,6 +137,8 @@ class ProactiveBot extends ActivityHandler {
                 return;
             }
         }
+
+        await this.easterEggs(context, next);
     }
     
     //
@@ -372,7 +374,8 @@ class ProactiveBot extends ActivityHandler {
             }
 
             if (allPaid) {
-                await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt chị chủ, em xin cám ơn <3`);
+                this.cronBill && this.cronBill.stop();
+                await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt chị chủ, em xin cám ơn all <3`);
             }
         } else {
             await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
@@ -406,6 +409,30 @@ How to cancel an order: @Pháo Tự Động cancel
 
 How to pay: Put cash in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
 Ex: @Pháo Tự Động x`);
+        }
+
+        await next();
+    }
+
+    async easterEggs(context, next) {
+        const text = context.activity.text.toLowerCase().trim();
+
+        if (text.indexOf('the sorrow and despair') >= 0) {
+            await context.sendActivity('Became too much to bear :\'(');
+            await next();
+            return;
+        }
+
+        if (text.indexOf('vit') >= 0) {
+            await context.sendActivity('@@ *Bark Bark*');
+            await next();
+            return;
+        }
+
+        if (text.indexOf('legends never die') >= 0) {
+            await context.sendActivity('!! They become a part of you');
+            await next();
+            return;
         }
 
         await next();
