@@ -100,7 +100,7 @@ class ProactiveBot extends ActivityHandler {
         }
 
         // Help message
-        this.sendHelpMessage(context);
+        await this.sendHelpMessage(context);
     }
 
     async openOrder(context) {
