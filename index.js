@@ -64,7 +64,7 @@ server.post('/api/messages', (req, res) => {
 
 // Listen for incoming notifications and send proactive messages to users.
 server.get('/api/chat', async (req, res) => {
-    console.log(req.params);
+    console.log(req);
 
     if (bot.groupConversationReference) {
         await adapter.continueConversation(bot.groupConversationReference, async turnContext => {
