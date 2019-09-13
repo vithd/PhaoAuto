@@ -17,6 +17,7 @@ class ProactiveBot extends ActivityHandler {
         super();
 
         this.adapter = adapter;
+        this.debug = true;
 
         // Master password to access administration features
         this.masterPassword = 'sinhnhatvuivenhavit';
@@ -92,14 +93,14 @@ class ProactiveBot extends ActivityHandler {
         // Begin ordering sequences
         if (this.isMaster(context.activity) && 
             (text.indexOf('chốt') >= 0 || text.indexOf('lúc') >= 0
-            || text.indexOf('nhờ') >= 0 || text.indexOf('giúp') >= 0) 
-            && text.indexOf('nhé') >= 0
+            || text.indexOf('nhờ') >= 0 || text.indexOf('giúp') >= 0)
         ) {
+            this.resetOrderJob();
             await this.openOrder(context, next);
             return;
         }
 
-        if (this.orderEnabled || true) {
+        if (this.orderEnabled || this.debug) {
             const parseOrder = /Pháo Tự Động\s*(\d+)(.*)/.exec(context.activity.text);
             if (parseOrder !== null && parseOrder.length > 1) {
                 const quantity = parseInt(parseOrder[1]);
@@ -117,12 +118,22 @@ class ProactiveBot extends ActivityHandler {
                     return;
                 }
 
+                if (note.indexOf('suất') == 0) {
+                    note = note.replace('suất', '').trim();
+                }
+
                 await this.placeOrder(context, next, quantity, note);
                 return;
             }
 
             if (text.indexOf('hủy') >= 0 || text.indexOf('cancel') >= 0) {
                 await this.cancelOrder(context, next);
+                return;
+            }
+
+            const parsePaid = /\s+x\s+/g.exec(context.activity.text);
+            if (parsePaid !== null) {
+                await this.payOrder(context, next);
                 return;
             }
         }
@@ -151,6 +162,12 @@ class ProactiveBot extends ActivityHandler {
 
         await this.sendHelpMessage(context, next);
         await next();
+    }
+
+    resetOrderJob() {
+        this.cronReminder && this.cronBill.stop();
+        this.cronOrder && this.cronOrder.stop();
+        this.cronBill && this.cronBill.stop();
     }
 
     async openOrder(context, next) {
@@ -222,12 +239,14 @@ class ProactiveBot extends ActivityHandler {
         }, null, true, 'Asia/Ho_Chi_Minh');
         
         // THE BILL COMES DUE
-        let billHour = hour,
-            billMinute = (minute + 1) % 60;
+        // let billHour = hour,
+        //     billMinute = (minute + 1) % 60;
 
-        if (billMinute < minute) {
-            billHour += 1;
-        }
+        // if (billMinute < minute) {
+        //     billHour += 1;
+        // }
+
+        let billHour = 17, billMinute = 0;
 
         this.cronBill = new CronJob(`0 ${billMinute} ${billHour} * * *`, async () => {
             console.log('The bill comes due');
@@ -235,11 +254,13 @@ class ProactiveBot extends ActivityHandler {
             let orderRecords = [];
             let total = 0;
             for (const order of Object.values(this.orders)) {
-                orderRecords.push(
-                    sprintf('%-30s %d %s', order.name, order.quantity, order.note)
-                );
+                if (order.paid === false) {
+                    orderRecords.push(
+                        sprintf('%-30s %d %s', order.name, order.quantity, order.note)
+                    );
 
-                total += order.quantity;
+                    total += order.quantity;
+                }
             }
 
             if (total > 0) {
@@ -248,6 +269,9 @@ class ProactiveBot extends ActivityHandler {
                     await turnContext.sendActivity(orderRecords.join('\n'));
                     await turnContext.sendActivity(`Tổng nợ ${total} suất`);
                 });
+            } else {
+                // Reset Order
+                this.orders = {}
             }
 
             this.cronBill.stop();
@@ -272,9 +296,8 @@ class ProactiveBot extends ActivityHandler {
     }
 
     isMaster(activity) {
-        return true; // Debug
         const userId = activity.from.id;
-        return userId in this.adminConversationReferences;
+        return this.debug || userId in this.adminConversationReferences;
     }
 
     setGroupConversationReference(activity) {
@@ -297,7 +320,8 @@ class ProactiveBot extends ActivityHandler {
             conversationReference,
             name: context.activity.from.name,
             quantity,
-            note
+            note,
+            paid: false,
         };
 
         const answers = ['Đã nhận của', 'E nhớ rồi thưa', 'Được rồi ạ', 'Đã nhớ ', 'Vâng, tks', 'Got it!', 'Noted', 'Ok ạ', 'Vâng', 'E nhớ rồi ', 'Dạ', 'Okie', 'Cám ơn', 'Thank you', 'Merci', 'Đã lưu', 'Đã xem'];
@@ -329,17 +353,43 @@ class ProactiveBot extends ActivityHandler {
         await next();
     }
 
+    async payOrder(context, next) {
+        const conversationReference = TurnContext.getConversationReference(context.activity);
+
+        if (conversationReference.user.id in this.orders) {
+            this.orders[conversationReference.user.id].paid = true;
+
+            await context.sendActivity(`${context.activity.from.name} đã đóng tiền~`);
+
+            // Everyone paid, says thanks and cancel The Bill comes due
+            let allPaid = true;
+            for (order of Object.values(this.orders)) {
+                if (order.paid === false) {
+                    allPaid = false;
+                    break;
+                }
+            }
+
+            if (allPaid) {
+                await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt chị chủ, em xin cám ơn <3`);
+            }
+        } else {
+            await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
+        }
+
+        await next();
+    }
+
     async sendHelpMessage(context, next, language = 'VN') {
         const name = context.activity.from.name;
 
         if (language === 'VN') {
             await context.sendActivity(`Xin chào ${name}! Đây là Cơm Pháo~ Hàng ngày vào buổi sáng chị chủ Pháo sẽ gửi cơm vào group và hẹn giờ chốt cơm. Em sẽ mở đăng ký đến giờ chốt cơm, nhận tiền và báo nợ thay mặt chị chủ.
     
-Cách đặt cơm: @phaotudong [so luong] [ghi chu]
+Cách đặt cơm: @Pháo Tự Động [so luong] [ghi chu]
 Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
 
-Cách hủy cơm: @phaotudong hủy
-Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
+Cách hủy cơm: @Pháo Tự Động hủy
 
 Cách trả tiền: Bỏ tiền vào hộp tiền Cơm Nhà Pháo,tag Pháo Tự Động, thêm chữ x, ghi momo nếu dùng Momo
 Ví dụ "@Pháo Tự Động x" hoặc "@Pháo Tự Động x momo"
@@ -352,12 +402,10 @@ How to order: @Pháo Tự Động [quatity] [note]
 Ex: @Pháo Tự Động 2 nhiều thịt ít rau (It means "more meat less veget")
 
 How to cancel an order: @Pháo Tự Động cancel
-Ex: @Pháo Tự Động cancel
 
 How to pay: Put cash in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
 Ex: @Pháo Tự Động x`);
         }
-
 
         await next();
     }
