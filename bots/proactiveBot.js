@@ -73,7 +73,7 @@ class ProactiveBot extends ActivityHandler {
             if (this.isMaster(context.activity)) {
                 this.setGroupConversationReference(context.activity);
 
-                await adapter.continueConversation(this.groupConversationReference, async turnContext => {
+                await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
                     await turnContext.sendActivity('proactive hello');
                 });
 
