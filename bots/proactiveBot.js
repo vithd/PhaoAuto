@@ -225,7 +225,7 @@ class ProactiveBot extends ActivityHandler {
                     await turnContext.sendActivity(orderRecords.join('\n'));
                     await turnContext.sendActivity(`Tổng ${total} suất`);
                 } else {
-                    await turnContext.sendActivity(`Huhu tổng hnay là 0 suất ;3;`);
+                    await turnContext.sendActivity(`Huhu, kì ghê, tổng hnay là 0 suất ;3;`);
                 }
                 console.log('Order sent');
             });
@@ -268,6 +268,8 @@ class ProactiveBot extends ActivityHandler {
                     await turnContext.sendActivity(orderRecords.join('\n'));
                     await turnContext.sendActivity(`Tổng nợ ${total} suất`);
                 });
+            } else {
+                console.log('...but all are paid');
             }
 
             // Reset Order
