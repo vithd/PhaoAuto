@@ -67,7 +67,7 @@ server.post('/api/messages', (req, res) => {
 server.use(restify.plugins.bodyParser());
 
 server.get('/chat', async (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.writeHead(200);
     res.write(sprintf(chatHTML, bot.groupConversationReference ? 'OK' : 'Unset'));
     res.end();
@@ -83,7 +83,7 @@ server.post('/chat', async (req, res) => {
         });
     }
 
-    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.writeHead(200);
     res.write(sprintf(chatHTML, bot.groupConversationReference ? 'OK' : 'Unset'));
     res.end();
@@ -91,6 +91,7 @@ server.post('/chat', async (req, res) => {
 
 const chatHTML = `<html>
 <head>
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
     <style>
         body {
