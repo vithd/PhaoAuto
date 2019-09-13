@@ -250,7 +250,7 @@ class ProactiveBot extends ActivityHandler {
     }
 
     async placeOrder(context, next, quantity, note) {
-        console.log(orderContext);
+        console.log(`${context.activity.from.name} - ${quantity} - ${note}`);
 
         const conversationReference = TurnContext.getConversationReference(context.activity);
         this.orders[conversationReference.user.id] = {
