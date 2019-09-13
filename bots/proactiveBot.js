@@ -103,7 +103,7 @@ class ProactiveBot extends ActivityHandler {
             const parseOrder = /Pháo Tự Động\s*(\d+)(.*)/.exec(context.activity.text);
             if (parseOrder !== null && parseOrder.length > 1) {
                 const quantity = parseInt(parseOrder[1]);
-                const note = parseOrder.length === 3 ? parseOrder[2] : '';
+                const note = parseOrder.length === 3 ? parseOrder[2].trim() : '';
 
                 if (Number.isNaN(quantity)) {
                     await context.sendActivity('Sorry >~< Em không đọc được số lượng ạ, đặt lại giùm em nha');
@@ -202,7 +202,7 @@ class ProactiveBot extends ActivityHandler {
                     sprintf('%-30s %d %s', order.name, order.quantity, order.note)
                 );
 
-                total += quantity;
+                total += order.quantity;
             }
 
             await this.adapter.continueConversation(this.groupConversationReference, async turnContext => {
@@ -239,7 +239,7 @@ class ProactiveBot extends ActivityHandler {
                     sprintf('%-30s %d %s', order.name, order.quantity, order.note)
                 );
 
-                total += quantity;
+                total += order.quantity;
             }
 
             if (total > 0) {
