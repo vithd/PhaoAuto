@@ -260,27 +260,27 @@ class ProactiveBot extends ActivityHandler {
         if (language === 'VN') {
             await context.sendActivity(`Xin chào ${name}! Đây là Cơm Pháo~ Hàng ngày vào buổi sáng chị chủ Pháo sẽ gửi cơm vào group và hẹn giờ chốt cơm. Em sẽ mở đăng ký đến giờ chốt cơm, nhận tiền và báo nợ thay mặt chị chủ.
     
-            Cách đặt cơm: @phaotudong [so luong] [ghi chu]
-            Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
-            
-            Cách hủy cơm: @phaotudong hủy
-            Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
-            
-            Cách trả tiền: Bỏ tiền vào hộp tiền Cơm Nhà Pháo,tag Pháo Tự Động, thêm chữ x, ghi momo nếu dùng Momo
-            Ví dụ "@Pháo Tự Động x" hoặc "@Pháo Tự Động x momo"
-    
-            For *English instruction* please type "lol"`);
+Cách đặt cơm: @phaotudong [so luong] [ghi chu]
+Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
+
+Cách hủy cơm: @phaotudong hủy
+Ví dụ: @Pháo Tự Động 2 nhiều thịt ít rau
+
+Cách trả tiền: Bỏ tiền vào hộp tiền Cơm Nhà Pháo,tag Pháo Tự Động, thêm chữ x, ghi momo nếu dùng Momo
+Ví dụ "@Pháo Tự Động x" hoặc "@Pháo Tự Động x momo"
+
+For *English instruction* please type "lol"`);
         } else {
             await context.sendActivity(`Hallo ${name}! This is Cơm Pháo Lunch~ Everyday in morning my master will send lunch menu to the group. I'll open registration, take payment and remind paying at the end of the day.
     
-            How to order: @Pháo Tự Động [quatity] [note]
-            Ex: @Pháo Tự Động 2 nhiều thịt ít rau (It means "more meat less veget")
-            
-            How to cancel an order: @Pháo Tự Động cancel
-            Ex: @Pháo Tự Động cancel
-            
-            How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
-            Ex: @Pháo Tự Động x`);
+How to order: @Pháo Tự Động [quatity] [note]
+Ex: @Pháo Tự Động 2 nhiều thịt ít rau (It means "more meat less veget")
+
+How to cancel an order: @Pháo Tự Động cancel
+Ex: @Pháo Tự Động cancel
+
+How to pay: Put money in Cơm Nhà Pháo’s money box, tag Pháo Tự Động with an x
+Ex: @Pháo Tự Động x`);
         }
 
 
