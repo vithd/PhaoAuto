@@ -70,6 +70,8 @@ const chatHTML = `<html><body>
 </form>
 </body></html>`;
 
+server.use(restify.plugins.bodyParser());
+
 server.get('/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.writeHead(200);
