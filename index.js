@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const restify = require('restify');
 const sprintf = require('sprintf-js').sprintf;
+const Tail = require('tail').Tail;
 
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
 const { BotFrameworkAdapter } = require('botbuilder');
@@ -67,9 +68,12 @@ server.post('/api/messages', (req, res) => {
 server.use(restify.plugins.bodyParser());
 
 server.get('/chat', async (req, res) => {
+    
+
+
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.writeHead(200);
-    res.write(sprintf(chatHTML, bot.groupConversationReference ? 'OK' : 'Unset'));
+    res.write(sprintf(chatHTML, getLog(), bot.groupConversationReference ? 'OK' : 'Unset'));
     res.end();
 });
 
@@ -84,9 +88,25 @@ server.post('/chat', async (req, res) => {
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.writeHead(200);
-    res.write(sprintf(chatHTML, bot.groupConversationReference ? 'OK' : 'Unset'));
+    res.write(sprintf(chatHTML, getLog(), bot.groupConversationReference ? 'OK' : 'Unset'));
     res.end();
 });
+
+async function getLog() {
+    let logs = [];
+    
+    try {
+        tail = new Tail("/root/.pm2/logs/index-out.log");
+        await tail.on("line", function(data) {
+            logs.push(data);
+            console.log(data);
+        });
+    } catch (e) {
+        console.log(e);
+    }
+    
+    return logs.join('\n');
+}
 
 const chatHTML = `<html>
 <head>
@@ -117,8 +137,11 @@ const chatHTML = `<html>
 </head>
 <body>
 <form action="/chat" method="POST">
+    <pre>%s</pre>
+
     <label>Group connection: %s</label>
     <input type="text" name="chat" id="chat" value="" placeholder="Type a message here" autocomplete="off" autofocus>
+    <button type="submit">Reload</button>
     <button type="submit">Send</button>
 </form>
 </body>
