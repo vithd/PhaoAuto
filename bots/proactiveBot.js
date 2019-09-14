@@ -96,7 +96,9 @@ class ProactiveBot extends ActivityHandler {
                     await context.sendActivity('Em đã xóa các danh sách trước đó rồi ạ');
                 }
             }
-            await this.openOrder(context, next);
+
+            const changeCloseTime = clearOrders && this.orderEnabled;
+            await this.openOrder(context, next, changeCloseTime);
             await next();
             return;
         }
@@ -176,7 +178,7 @@ class ProactiveBot extends ActivityHandler {
         resetOrders && (this.orders = {});
     }
 
-    async openOrder(context, next) {
+    async openOrder(context, next, changeCloseTime) {
         let parsedTime = /(\d+)h(\d+)/gi.exec(context.activity.text);
         
         if (parsedTime === null || parsedTime.length !== 3) {
@@ -286,8 +288,12 @@ class ProactiveBot extends ActivityHandler {
             
         }, null, true, 'Asia/Ho_Chi_Minh');
 
-        await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${rawHour}h${rawMinute} nhé! PM riêng cho em để xem hướng dẫn na~`);
-        await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${rawHour}:${rawMinute}! Drop me a private message for instruction~`);
+        if (changeCloseTime) {
+            await context.sendActivity(`Dạ, em sẽ chốt cơm vào lúc ${rawHour}h${rawMinute} ạ`);
+        } else {
+            await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${rawHour}h${rawMinute} nhé! PM riêng cho em để xem hướng dẫn na~`);
+            await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${rawHour}:${rawMinute}! Drop me a private message for instruction~`);
+        }
         await next();
 
         console.log(`Order at ${rawHour}:${rawMinute}, remind at ${remindHour}:${remindMinute}, bill comes at ${billHour}:${billMinute}`);
