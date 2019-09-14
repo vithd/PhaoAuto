@@ -8,7 +8,6 @@ const fs = require('fs');
 const path = require('path');
 const restify = require('restify');
 const sprintf = require('sprintf-js').sprintf;
-const Tail = require('tail').Tail;
 
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
 const { BotFrameworkAdapter } = require('botbuilder');
@@ -92,20 +91,22 @@ server.post('/chat', async (req, res) => {
     res.end();
 });
 
-async function getLog() {
-    let logs = [];
-    
+function getLog() {
     try {
-        tail = new Tail("/root/.pm2/logs/index-out.log");
-        await tail.on("line", function(data) {
-            logs.push(data);
-            console.log(data);
-        });
+        const numberOfLines = 20;
+        let logs = [];
+        var data = fs.readFileSync('/root/.pm2/logs/index-error.log', 'utf8');
+        var lines = data.split("\n");
+
+        for (let i = lines.length - numberOfLines; i < lines.length; i++) {
+            logs.push(lines[i]);
+        }
+    
+        return logs.join('\n');
     } catch (e) {
         console.log(e);
+        return 'Unable to get Log';
     }
-    
-    return logs.join('\n');
 }
 
 const chatHTML = `<html>
