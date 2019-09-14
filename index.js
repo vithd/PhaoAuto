@@ -95,7 +95,7 @@ function getLog() {
     try {
         const numberOfLines = 20;
         let logs = [];
-        var data = fs.readFileSync('/root/.pm2/logs/index-error.log', 'utf8');
+        var data = fs.readFileSync('/root/.pm2/logs/index-out.log', 'utf8');
         var lines = data.split("\n");
 
         for (let i = lines.length - numberOfLines; i < lines.length; i++) {
@@ -140,9 +140,12 @@ const chatHTML = `<html>
             overflow: auto;
         }
 
+        button {
+            height: 30px;
+        }
+
         #send {
             float: right;
-            height: 30px;
         }
     </style>
 </head>
