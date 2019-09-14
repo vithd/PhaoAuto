@@ -88,8 +88,16 @@ class ProactiveBot extends ActivityHandler {
             (text.indexOf('chốt') >= 0 || text.indexOf('lúc') >= 0
             || text.indexOf('nhờ') >= 0 || text.indexOf('giúp') >= 0)
         ) {
-            this.resetOrderJob(text.indexOf('xóa') >= 0);
+            const clearOrders = text.indexOf('xóa') >= 0;
+            if (clearOrders) {
+                this.resetOrderJob(clearOrders);
+
+                if (this.orderEnabled) {
+                    await context.sendActivity('Em đã xóa các danh sách trước đó rồi ạ');
+                }
+            }
             await this.openOrder(context, next);
+            await next();
             return;
         }
 
