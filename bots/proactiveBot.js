@@ -97,7 +97,7 @@ class ProactiveBot extends ActivityHandler {
                 }
             }
 
-            const changeCloseTime = clearOrders && this.orderEnabled;
+            const changeCloseTime = this.orderEnabled;
             await this.openOrder(context, next, changeCloseTime);
             await next();
             return;
