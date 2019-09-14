@@ -207,6 +207,14 @@ class ProactiveBot extends ActivityHandler {
             hour = parseInt(parsedTime[1]),
             minute = parseInt(parsedTime[2]);
 
+        if (!(minute >= 0 && minute <= 60) || !(hour >= 0 && hour <= 23)) {
+            console.log('Wrong time:' + context.activity.text);
+            await context.sendActivity(`Ơ chị ơi thời gian bị sai sai hay sao ý: ${rawHour}h${rawMinute}`);
+            await context.sendActivity('Chị nhớ ghi là "10h30" hay "13h00" e mới hiểu nha');
+            await next();
+            return;
+        }
+
         let remindHour = hour,
             remindMinute = minute - this.reminderBefore;
 
