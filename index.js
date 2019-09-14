@@ -126,7 +126,7 @@ const chatHTML = `<html>
         }
 
         #chat {
-            width: 100%;
+            width: 100%%;
             display: block;
             margin-bottom: 16px;
             height: 40px;
@@ -135,7 +135,7 @@ const chatHTML = `<html>
         }
 
         pre {
-            max-width: 100%;
+            max-width: 100%%;
             max-height: 80vh;
             overflow: auto;
         }
