@@ -35,7 +35,7 @@ class ProactiveBot extends ActivityHandler {
             for (let cnt = 0; cnt < membersAdded.length; cnt++) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id
                     && context.activity.conversation.isGroup) {
-                    await context.sendActivity('Chào mừng đến với Cơm Pháo <3 Em là trợ lý ảo của chị chủ group, hãy pm riêng với em để xem hướng dẫn đặt cơm nha~');
+                    await context.sendActivity('Chào mừng đến với Cơm Pháo <3 Em là trợ lý ảo của chị chủ nhà Pháo, hãy pm riêng với em để xem hướng dẫn đặt cơm nha~');
                 }
             }
 
@@ -196,8 +196,8 @@ class ProactiveBot extends ActivityHandler {
         
         if (parsedTime === null || parsedTime.length !== 3) {
             console.log('Cannot parse time in Order message:' + context.activity.text);
-            await context.sendActivity('Ơ chị Pháo ơi, em không đọc được giờ chốt ạ >~<');
-            await context.sendActivity('Chị nhớ ghi là "10h30" hay "13h00" e mới hiểu nha');
+            await context.sendActivity('Ơ, em không đọc được giờ chốt ạ >~<');
+            await context.sendActivity('Nhớ ghi là "10h30" hay "13h00" e mới hiểu nha');
             await next();
             return;
         }
@@ -209,8 +209,8 @@ class ProactiveBot extends ActivityHandler {
 
         if (!(minute >= 0 && minute <= 60) || !(hour >= 0 && hour <= 23)) {
             console.log('Wrong time:' + context.activity.text);
-            await context.sendActivity(`Ơ chị ơi thời gian bị sai sai hay sao ý: ${rawHour}h${rawMinute}`);
-            await context.sendActivity('Chị nhớ ghi là "10h30" hay "13h00" e mới hiểu nha');
+            await context.sendActivity(`Ơ, thời gian bị sai sai hay sao ý: ${rawHour}h${rawMinute}`);
+            await context.sendActivity('Nhớ ghi là "10h30" hay "13h00" e mới hiểu nha');
             await next();
             return;
         }
@@ -413,7 +413,7 @@ class ProactiveBot extends ActivityHandler {
 
             if (allPaid) {
                 this.cronBill && this.cronBill.stop();
-                await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt chị chủ, em xin cám ơn all <3`);
+                await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn all <3`);
             }
         } else {
             await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
@@ -473,6 +473,7 @@ Ex: @Pháo Tự Động x`);
             return;
         }
 
+        await context.sendActivity(`Em không hiểu ${context.activity.from.name}, inbox em để xem hướng dẫn nha`);
         await next();
     }
 
