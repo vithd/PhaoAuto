@@ -121,8 +121,12 @@ const chatHTML = `<html>
             background: #e67664;
         }
 
+        form {
+            max-width: 600px;
+        }
+
         #chat {
-            width: 300px;
+            width: 100%;
             display: block;
             margin-bottom: 16px;
             height: 40px;
@@ -130,7 +134,13 @@ const chatHTML = `<html>
             padding: 5px 8px;
         }
 
-        button {
+        pre {
+            max-width: 100%;
+            max-height: 80vh;
+            overflow: auto;
+        }
+
+        #send {
             float: right;
             height: 30px;
         }
@@ -142,8 +152,8 @@ const chatHTML = `<html>
 
     <label>Group connection: %s</label>
     <input type="text" name="chat" id="chat" value="" placeholder="Type a message here" autocomplete="off" autofocus>
-    <button type="submit">Reload</button>
-    <button type="submit">Send</button>
+    <button onclick="location.reload()">Reload</button>
+    <button id="send" type="submit">Send</button>
 </form>
 </body>
 </html>`;
