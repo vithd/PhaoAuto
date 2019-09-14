@@ -93,7 +93,7 @@ class ProactiveBot extends ActivityHandler {
                 this.resetOrderJob(clearOrders);
 
                 if (this.orderEnabled) {
-                    await context.sendActivity('Em đã xóa các danh sách trước đó rồi ạ');
+                    await context.sendActivity('Em đã xóa các danh sách đã đặt trước đó rồi ạ');
                 }
             }
 
@@ -179,6 +179,11 @@ class ProactiveBot extends ActivityHandler {
     }
 
     async openOrder(context, next, changeCloseTime) {
+        const conversationReference = TurnContext.getConversationReference(context.activity);
+        if (this.groupConversationReference === null) {
+            this.groupConversationReference = conversationReference;
+        }
+
         let parsedTime = /(\d+)h(\d+)/gi.exec(context.activity.text);
         
         if (parsedTime === null || parsedTime.length !== 3) {
@@ -289,7 +294,7 @@ class ProactiveBot extends ActivityHandler {
         }, null, true, 'Asia/Ho_Chi_Minh');
 
         if (changeCloseTime) {
-            await context.sendActivity(`Dạ, em sẽ chốt cơm vào lúc ${rawHour}h${rawMinute} ạ`);
+            await context.sendActivity(`Chốt cơm vào lúc ${rawHour}h${rawMinute} ạ`);
         } else {
             await context.sendActivity(`Cơm Nhà Pháo đã mở đăng ký, mọi người đặt cơm trước ${rawHour}h${rawMinute} nhé! PM riêng cho em để xem hướng dẫn na~`);
             await context.sendActivity(`Cơm Nhà Pháo is open for lunch registration, order ends at ${rawHour}:${rawMinute}! Drop me a private message for instruction~`);
@@ -359,6 +364,10 @@ class ProactiveBot extends ActivityHandler {
 
     async cancelOrder(context, next) {
         const conversationReference = TurnContext.getConversationReference(context.activity);
+
+        if (this.groupConversationReference === null) {
+            this.groupConversationReference = conversationReference;
+        }
 
         if (conversationReference.user.id in this.orders) {
             delete this.orders[conversationReference.user.id];
