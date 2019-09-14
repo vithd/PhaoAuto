@@ -88,7 +88,7 @@ class ProactiveBot extends ActivityHandler {
             (text.indexOf('chốt') >= 0 || text.indexOf('lúc') >= 0
             || text.indexOf('nhờ') >= 0 || text.indexOf('giúp') >= 0)
         ) {
-            this.resetOrderJob();
+            this.resetOrderJob(text.indexOf('xóa') >= 0);
             await this.openOrder(context, next);
             return;
         }
@@ -161,11 +161,11 @@ class ProactiveBot extends ActivityHandler {
         await next();
     }
 
-    resetOrderJob() {
+    resetOrderJob(resetOrders) {
         this.cronReminder && this.cronBill.stop();
         this.cronOrder && this.cronOrder.stop();
         this.cronBill && this.cronBill.stop();
-        this.orders = {};
+        resetOrders && (this.orders = {});
     }
 
     async openOrder(context, next) {
