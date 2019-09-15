@@ -180,7 +180,7 @@ class ProactiveBot extends ActivityHandler {
     }
 
     resetOrderJob(resetOrders) {
-        this.cronReminder && this.cronBill.stop();
+        this.cronReminder && this.cronReminder.stop();
         this.cronOrder && this.cronOrder.stop();
         this.cronBill && this.cronBill.stop();
         resetOrders && (this.orders = {});
