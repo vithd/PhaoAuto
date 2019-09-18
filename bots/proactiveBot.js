@@ -148,7 +148,7 @@ class ProactiveBot extends ActivityHandler {
         }
 
         const parsePaid = /\s+x\s*/gi.exec(context.activity.text);
-        if (parsePaid !== null && Object.values(this.orders).length > 0) {
+        if (parsePaid !== null && (Object.values(this.orders).length > 0 || Object.values(this.ordersYesterday).length > 0)) {
             await this.payOrder(context, next);
             return;
         }
@@ -247,10 +247,6 @@ class ProactiveBot extends ActivityHandler {
             // Set as yesterday orders & Reset Order
             this.ordersYesterday = Object.assign({}, this.orders);
             this.orders = {};
-            console.log('this.orders');
-            console.log(this.orders);
-            console.log('this.ordersYesterday');
-            console.log(this.ordersYesterday);
         }
         
         this.orderOpened = true;
