@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-const { ActivityHandler, TurnContext } = require('botbuilder');
+const { ActivityHandler, TurnContext, ActivityTypes } = require('botbuilder');
 const sprintf = require('sprintf-js').sprintf;
 const CronJob = require('cron').CronJob;
 
