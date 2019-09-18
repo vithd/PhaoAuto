@@ -4,6 +4,7 @@
 const { ActivityHandler, TurnContext, ActivityTypes } = require('botbuilder');
 const sprintf = require('sprintf-js').sprintf;
 const CronJob = require('cron').CronJob;
+const path = require('path');
 const fs = require('fs');
 
 class ProactiveBot extends ActivityHandler {
