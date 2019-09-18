@@ -445,7 +445,7 @@ class ProactiveBot extends ActivityHandler {
     async payOrder(context, next) {
         const conversationReference = TurnContext.getConversationReference(context.activity);
 
-        if (conversationReference.user.id in this.orders) {
+        if (conversationReference.user.id in this.orders && !this.orders[conversationReference.user.id].paid) {
             this.orders[conversationReference.user.id].paid = true;
             await context.sendActivity(`${context.activity.from.name} đã đóng tiền~`);
 
@@ -470,7 +470,7 @@ class ProactiveBot extends ActivityHandler {
                 }
             }
         } else {
-            if (conversationReference.user.id in this.ordersYesterday) {
+            if (conversationReference.user.id in this.ordersYesterday && !this.ordersYesterday[conversationReference.user.id].paid) {
                 this.ordersYesterday[conversationReference.user.id].paid = true;
                 await context.sendActivity(`${context.activity.from.name} đã đóng tiền bữa trước. Sau đóng trước 5PM giúp e nha~`);
 
@@ -491,6 +491,7 @@ class ProactiveBot extends ActivityHandler {
                 await next();
                 return;
             }
+            
             await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
         }
 
