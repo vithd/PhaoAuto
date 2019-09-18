@@ -460,7 +460,9 @@ class ProactiveBot extends ActivityHandler {
                 if (this.cronBill) {
                     this.cronBill.stop();
                     this.cronBill = undefined;
-                    await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo trước 5PM!!! Thay mặt nhà Pháo, em xin cám ơn all <3`);
+                    if (this.orderOpened === false) {
+                        await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo trước 5PM!!! Thay mặt nhà Pháo, em xin cám ơn all <3`);
+                    }
                 } else {
                     await context.sendActivity(`Mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn.`);
                 }
