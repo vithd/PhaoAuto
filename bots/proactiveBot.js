@@ -230,11 +230,13 @@ class ProactiveBot extends ActivityHandler {
             let orderRecords = [];
             let total = 0;
             for (const order of Object.values(this.orders)) {
-                orderRecords.push(
-                    sprintf('%-30s %d %s', order.name, order.quantity, order.note)
-                );
+                if (order.paid === false) {
+                    orderRecords.push(
+                        sprintf('%-30s %d %s', order.name, order.quantity, order.note)
+                    );
 
-                total += order.quantity;
+                    total += order.quantity;
+                }
             }
 
             if (total > 0) {
