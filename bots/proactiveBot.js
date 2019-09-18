@@ -181,9 +181,9 @@ class ProactiveBot extends ActivityHandler {
     }
 
     resetOrderJob(resetOrders) {
-        this.cronReminder && this.cronReminder.stop();
-        this.cronOrder && this.cronOrder.stop();
-        this.cronBill && this.cronBill.stop();
+        this.cronReminder && this.cronReminder.stop() && (this.cronReminder = undefined);
+        this.cronOrder && this.cronOrder.stop() && (this.cronOrder = undefined);
+        this.cronBill && this.cronBill.stop() && (this.cronBill = undefined);
         resetOrders && (this.orders = {});
     }
 
@@ -454,6 +454,7 @@ class ProactiveBot extends ActivityHandler {
             if (allPaid) {
                 if (this.cronBill) {
                     this.cronBill.stop();
+                    this.cronBill = undefined;
                     await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo trước 5PM!!! Thay mặt nhà Pháo, em xin cám ơn all <3`);
                 } else {
                     await context.sendActivity(`Mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn.`);
