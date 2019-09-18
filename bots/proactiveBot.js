@@ -258,6 +258,7 @@ class ProactiveBot extends ActivityHandler {
             });
 
             this.cronReminder.stop();
+            this.cronReminder = undefined;
         }, null, true, 'Asia/Ho_Chi_Minh');
 
         // ORDER
@@ -287,6 +288,7 @@ class ProactiveBot extends ActivityHandler {
             
             this.orderOpened = false;
             this.cronOrder.stop();
+            this.cronOrder = undefined;
             console.log('Order closed');
         }, null, true, 'Asia/Ho_Chi_Minh');
         
@@ -335,6 +337,7 @@ class ProactiveBot extends ActivityHandler {
             }
 
             this.cronBill.stop();
+            this.cronBill = undefined;
             
         }, null, true, 'Asia/Ho_Chi_Minh');
 
