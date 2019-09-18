@@ -247,6 +247,10 @@ class ProactiveBot extends ActivityHandler {
             // Set as yesterday orders & Reset Order
             this.ordersYesterday = Object.assign({}, this.orders);
             this.orders = {};
+            console.log('this.orders');
+            console.log(this.orders);
+            console.log('this.ordersYesterday');
+            console.log(this.ordersYesterday);
         }
         
         this.orderOpened = true;
