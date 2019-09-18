@@ -470,7 +470,7 @@ class ProactiveBot extends ActivityHandler {
             }
         } else {
             if (conversationReference.user.id in this.ordersYesterday) {
-                this.orders[conversationReference.user.id].paid = true;
+                this.ordersYesterday[conversationReference.user.id].paid = true;
                 await context.sendActivity(`${context.activity.from.name} đã đóng tiền bữa trước. Sau đóng trước 5PM giúp e nha~`);
 
                 let allPaid = true;
