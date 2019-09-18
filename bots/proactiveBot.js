@@ -20,7 +20,7 @@ class ProactiveBot extends ActivityHandler {
         this.orderConversationReferences = {};
         this.adminConversationReferences = {};
         this.groupConversationReference = null;
-        this.orderEnabled = false;
+        this.orderOpened = false;
         this.orders = {};
         this.reminderBefore = 5; // minutes
 
@@ -92,18 +92,18 @@ class ProactiveBot extends ActivityHandler {
             this.resetOrderJob(clearOrders);
 
             if (clearOrders) {
-                if (this.orderEnabled) {
+                if (this.orderOpened) {
                     await context.sendActivity('Em đã xóa các danh sách đã đặt trước đó rồi ạ');
                 }
             }
             
-            const changeCloseTime = this.orderEnabled;
+            const changeCloseTime = this.orderOpened;
             await this.openOrder(context, next, changeCloseTime);
             await next();
             return;
         }
 
-        if (this.orderEnabled || this.debug) {
+        if (this.orderOpened || this.debug) {
             const parseOrder = /Pháo Tự Động\s*(\d+)(.*)/.exec(context.activity.text);
             if (parseOrder !== null && parseOrder.length > 1) {
                 const quantity = parseInt(parseOrder[1]);
@@ -129,7 +129,7 @@ class ProactiveBot extends ActivityHandler {
                 return;
             }
 
-            if (text.indexOf('hủy') >= 0 || text.indexOf('cancel') >= 0) {
+            if (text.indexOf('hủy') >= 0 || text.indexOf('huỷ') >= 0 || text.indexOf('cancel') >= 0) {
                 await this.cancelOrder(context, next);
                 return;
             }
@@ -142,13 +142,12 @@ class ProactiveBot extends ActivityHandler {
                 await next();
                 return;
             }
+        }
 
-
-            const parsePaid = /\s+x\s*/gi.exec(context.activity.text);
-            if (parsePaid !== null) {
-                await this.payOrder(context, next);
-                return;
-            }
+        const parsePaid = /\s+x\s*/gi.exec(context.activity.text);
+        if (parsePaid !== null && Object.values(this.orders).length > 0) {
+            await this.payOrder(context, next);
+            return;
         }
 
         await this.easterEggs(context, next);
@@ -222,8 +221,31 @@ class ProactiveBot extends ActivityHandler {
             remindHour = this.mod((remindHour - 1), 24);
             remindMinute = this.mod((minute - this.reminderBefore), 60);
         }
+
+        // Reminds yesterday
+        if (this.orderOpened === false) {
+            let orderRecords = [];
+            let total = 0;
+            for (const order of Object.values(this.orders)) {
+                orderRecords.push(
+                    sprintf('%-30s %d %s', order.name, order.quantity, order.note)
+                );
+
+                total += order.quantity;
+            }
+
+            if (total > 0) {
+                await context.sendActivity(`Hôm qua còn các a/c chưa đóng tiền ạ`);
+                await context.sendActivity(orderRecords.join('\n'));
+                await context.sendActivity(`Tổng nợ ${total} suất`);
+                await next();
+            }
+
+            // Reset Order
+            this.orders = {};
+        }
         
-        this.orderEnabled = true;
+        this.orderOpened = true;
 
         // REMINDER
         this.cronReminder = new CronJob(`0 ${remindMinute} ${remindHour} * * *`, async () => {
@@ -261,7 +283,7 @@ class ProactiveBot extends ActivityHandler {
                 console.log('Order sent');
             });
             
-            this.orderEnabled = false;
+            this.orderOpened = false;
             this.cronOrder.stop();
             console.log('Order closed');
         }, null, true, 'Asia/Ho_Chi_Minh');
@@ -298,13 +320,18 @@ class ProactiveBot extends ActivityHandler {
                     await turnContext.sendActivity(`Các anh chị ơi đóng tiền giúp em với ạ`);
                     await turnContext.sendActivity(orderRecords.join('\n'));
                     await turnContext.sendActivity(`Tổng nợ ${total} suất`);
+
+                    const shameMessage = { 
+                        type: ActivityTypes.Message,
+                        attachments: [this.getShameAttachment()],
+                    };
+
+                    await turnContext.sendActivity(shameMessage);
                 });
             } else {
                 console.log('...but all are paid');
             }
 
-            // Reset Order
-            this.orders = {}
             this.cronBill.stop();
             
         }, null, true, 'Asia/Ho_Chi_Minh');
@@ -344,6 +371,17 @@ class ProactiveBot extends ActivityHandler {
         console.log(`${activity.from.name} told me to setup group`);
     }
 
+    getShameAttachment() {
+        const imageData = fs.readFileSync(path.join(__dirname, 'shame.gif'));
+        const base64Image = Buffer.from(imageData).toString('base64');
+
+        return {
+            name: 'shame.gif',
+            contentType: 'image/gif',
+            contentUrl: `data:image/gif;base64,${ base64Image }`
+        };
+    }
+
     async placeOrder(context, next, quantity, note) {
         console.log(`${context.activity.from.name} - ${quantity} - ${note}`);
 
@@ -370,7 +408,7 @@ class ProactiveBot extends ActivityHandler {
 
         let answer = answers[answer_i];
         if (Math.round(Math.random() * 1000) === 69) {
-            answer = 'Woaaaaa, bất ngờ chưa! Suất may mắn này free cho';
+            answer = 'Woaaaaa, bất ngờ chưa! Tỷ lệ trúng 1/1000 Suất may mắn này free! ';
         }
 
         note = note ? `(${note})` : '';
@@ -412,8 +450,15 @@ class ProactiveBot extends ActivityHandler {
             }
 
             if (allPaid) {
-                this.cronBill && this.cronBill.stop();
-                await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn all <3`);
+                if (this.cronBill) {
+                    this.cronBill.stop();
+                    await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo trước 5PM!!! Thay mặt nhà Pháo, em xin cám ơn all <3`);
+                } else {
+                    await context.sendActivity(`Mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn.`);
+                }
+
+                // Reset Orders
+                this.orders = {};
             }
         } else {
             await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
