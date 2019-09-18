@@ -24,6 +24,7 @@ class ProactiveBot extends ActivityHandler {
         this.groupConversationReference = null;
         this.orderOpened = false;
         this.orders = {};
+        this.ordersYesterday = {};
         this.reminderBefore = 5; // minutes
 
         this.onConversationUpdate(async (context, next) => {
@@ -243,7 +244,8 @@ class ProactiveBot extends ActivityHandler {
                 await next();
             }
 
-            // Reset Order
+            // Set as yesterday orders & Reset Order
+            this.ordersYesterday = Object.assign({}, this.orders);
             this.orders = {};
         }
         
@@ -467,6 +469,27 @@ class ProactiveBot extends ActivityHandler {
                 this.orders = {};
             }
         } else {
+            if (conversationReference.user.id in this.ordersYesterday) {
+                this.orders[conversationReference.user.id].paid = true;
+                await context.sendActivity(`${context.activity.from.name} đã đóng tiền bữa trước. Sau đóng trước 5PM giúp e nha~`);
+
+                let allPaid = true;
+                for (const order of Object.values(this.ordersYesterday)) {
+                    if (order.paid === false) {
+                        allPaid = false;
+                        break;
+                    }
+                }
+
+                if (allPaid) {
+                    await context.sendActivity(`Bữa trước đã đóng đụ ạ`);
+                    // Clear yesterday orders
+                    this.ordersYesterday = {};
+                }
+
+                await next();
+                return;
+            }
             await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
         }
 
