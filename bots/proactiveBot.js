@@ -445,13 +445,12 @@ class ProactiveBot extends ActivityHandler {
     async payOrder(context, next) {
         const conversationReference = TurnContext.getConversationReference(context.activity);
 
-        if (conversationReference.user.id in this.orders && !this.orders[conversationReference.user.id].paid) {
-            this.orders[conversationReference.user.id].paid = true;
-            await context.sendActivity(`${context.activity.from.name} đã đóng tiền~`);
+        if (conversationReference.user.id in this.ordersYesterday && !this.ordersYesterday[conversationReference.user.id].paid) {
+            this.ordersYesterday[conversationReference.user.id].paid = true;
+            await context.sendActivity(`${context.activity.from.name} đã đóng tiền bữa trước. Sau đóng trước 5PM giúp e nha~`);
 
-            // Everyone paid, says thanks and cancel The Bill comes due
             let allPaid = true;
-            for (const order of Object.values(this.orders)) {
+            for (const order of Object.values(this.ordersYesterday)) {
                 if (order.paid === false) {
                     allPaid = false;
                     break;
@@ -459,39 +458,45 @@ class ProactiveBot extends ActivityHandler {
             }
 
             if (allPaid) {
-                if (this.cronBill) {
-                    this.cronBill.stop();
-                    this.cronBill = undefined;
-                    if (this.orderOpened === false) {
-                        await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo trước 5PM!!! Thay mặt nhà Pháo, em xin cám ơn all <3`);
-                    }
-                } else {
-                    await context.sendActivity(`Mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn.`);
-                }
+                await context.sendActivity(`Bữa trước đã đóng đụ ạ`);
+                // Clear yesterday orders
+                this.ordersYesterday = {};
             }
-        } else {
-            if (conversationReference.user.id in this.ordersYesterday && !this.ordersYesterday[conversationReference.user.id].paid) {
-                this.ordersYesterday[conversationReference.user.id].paid = true;
-                await context.sendActivity(`${context.activity.from.name} đã đóng tiền bữa trước. Sau đóng trước 5PM giúp e nha~`);
 
+            await next();
+        } else {
+            if (conversationReference.user.id in this.orders) {
+                if (this.orders[conversationReference.user.id].paid) {
+                    await context.sendActivity(`${context.activity.from.name} đánh dấu trước đó rồi ạ`);
+                    return;
+                }
+    
+                this.orders[conversationReference.user.id].paid = true;
+                await context.sendActivity(`${context.activity.from.name} đã đóng tiền~`);
+    
+                // Everyone paid, says thanks and cancel The Bill comes due
                 let allPaid = true;
-                for (const order of Object.values(this.ordersYesterday)) {
+                for (const order of Object.values(this.orders)) {
                     if (order.paid === false) {
                         allPaid = false;
                         break;
                     }
                 }
-
+    
                 if (allPaid) {
-                    await context.sendActivity(`Bữa trước đã đóng đụ ạ`);
-                    // Clear yesterday orders
-                    this.ordersYesterday = {};
+                    if (this.cronBill) {
+                        this.cronBill.stop();
+                        this.cronBill = undefined;
+                        if (this.orderOpened === false) {
+                            await context.sendActivity(`Woaa...mọi người đã đóng đủ tiền cho nhà Pháo trước 5PM!!! Thay mặt nhà Pháo, em xin cám ơn all <3`);
+                        }
+                    } else {
+                        await context.sendActivity(`Mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn.`);
+                    }
                 }
 
-                await next();
                 return;
             }
-            
             await context.sendActivity(`Ơ sao em thấy ${context.activity.from.name} hôm nay không đăng ký cơm á ;3;`);
         }
 
