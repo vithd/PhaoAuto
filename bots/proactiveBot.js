@@ -464,9 +464,6 @@ class ProactiveBot extends ActivityHandler {
                 } else {
                     await context.sendActivity(`Mọi người đã đóng đủ tiền cho nhà Pháo rồi ạ. Thay mặt nhà Pháo, em xin cám ơn.`);
                 }
-
-                // Reset Orders
-                this.orders = {};
             }
         } else {
             if (conversationReference.user.id in this.ordersYesterday) {
