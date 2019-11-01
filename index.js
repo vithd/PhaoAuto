@@ -46,8 +46,8 @@ if (process.env.local) {
     server = restify.createServer();
 } else {
     server = restify.createServer({
-        key: fs.readFileSync('/etc/letsencrypt/live/tungnt8.com-0001/privkey.pem'),
-        certificate: fs.readFileSync('/etc/letsencrypt/live/tungnt8.com-0001/fullchain.pem')
+        key: fs.readFileSync('/etc/letsencrypt/live/tungnt8.com/privkey.pem'),
+        certificate: fs.readFileSync('/etc/letsencrypt/live/tungnt8.com/fullchain.pem')
     });
 }
 server.listen(process.env.port || process.env.PORT || 8401, function() {

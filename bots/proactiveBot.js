@@ -106,6 +106,15 @@ class ProactiveBot extends ActivityHandler {
             return;
         }
 
+        if (this.cronBill) {
+            if (this.isMaster(context.activity) && text.indexOf('hủy order') >= 0) {
+                this.resetOrderJob(true);
+                await context.sendActivity('Vâng, em xóa order rồi ạ');
+                await next();
+                return;
+            }
+        }
+
         if (this.orderOpened || this.debug) {
             const parseOrder = /Pháo Tự Động\s*(\d+)(.*)/.exec(context.activity.text);
             if (parseOrder !== null && parseOrder.length > 1) {
@@ -134,15 +143,6 @@ class ProactiveBot extends ActivityHandler {
 
             if (text.indexOf('hủy') >= 0 || text.indexOf('huỷ') >= 0 || text.indexOf('cancel') >= 0) {
                 await this.cancelOrder(context, next);
-                return;
-            }
-        }
-
-        if (this.cronBill) {
-            if (this.isMaster(context.activity) && text.indexOf('hủy order') >= 0) {
-                this.resetOrderJob(true);
-                await context.sendActivity('Vâng, em xóa order rồi ạ');
-                await next();
                 return;
             }
         }
